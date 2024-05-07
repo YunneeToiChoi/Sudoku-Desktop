@@ -12,7 +12,8 @@ public class SudokuGenerator {
     public SudokuPuzzle solvedSudoku;
     
     //Create random sudoku
-    public SudokuPuzzle generateRandomSudoku(SudokuPuzzleType puzzleType) {
+    //String mode
+    public SudokuPuzzle generateRandomSudoku(SudokuPuzzleType puzzleType, String mode) {
 		SudokuPuzzle puzzle = new SudokuPuzzle(puzzleType.getRows(), puzzleType.getColumns(), puzzleType.getBoxWidth(), puzzleType.getBoxHeight(), puzzleType.getValidValues());
 		SudokuPuzzle copy = new SudokuPuzzle(puzzle);
 		Random randomGenerator = new Random();
@@ -30,8 +31,17 @@ public class SudokuGenerator {
                 
 		//random number to keep
                 //Optional: can be add if according to mode(easy,medium,hard) instead of 0.55555555
-		int numberOfValuesToKeep = (int)(0.5555555555*(copy.getNumRows()*copy.getNumRows()));
-                
+                int numberOfValuesToKeep;
+                if(mode.equals("Easy")){
+                    numberOfValuesToKeep = (int)(0.7777777777*(copy.getNumRows()*copy.getNumRows()));
+                }
+                else if (mode.equals("Medium")){
+                    numberOfValuesToKeep = (int)(0.5555555555*(copy.getNumRows()*copy.getNumRows()));
+                }
+                else{
+                    numberOfValuesToKeep = (int)(0.3333333333*(copy.getNumRows()*copy.getNumRows()));
+                }
+           
 		//random row and randow col to fill number
 		for(int i = 0;i < numberOfValuesToKeep;) {
 			int randomRow = randomGenerator.nextInt(puzzle.getNumRows());
