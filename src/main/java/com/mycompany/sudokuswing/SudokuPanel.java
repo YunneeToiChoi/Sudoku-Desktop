@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.sudokuswing;
 
 import java.awt.BasicStroke;
@@ -15,8 +12,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
+
 
 
 public class SudokuPanel extends JPanel{
@@ -124,20 +123,38 @@ public class SudokuPanel extends JPanel{
 		}
 	}
         
-	public void messageFromNumActionListener(String buttonValue) {
-            //TO DO: Compare btnValue with Result
-            //SudokuPuzzle solve = new SudokuGenerator().solvedSudoku;
-		if(currentlySelectedCol != -1 && currentlySelectedRow != -1) {
-//                    if(!buttonValue.equals(solve.getValue(currentlySelectedRow, currentlySelectedCol))){
-//                        System.out.print("sai");
-//                    }
-                    {
-                        puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
-			repaint();
+        public void messageFromNumActionListener(String buttonValue) {
+            if (currentlySelectedCol != -1 && currentlySelectedRow != -1) {
+                puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
+                repaint();
+                if (puzzle.boardFull()) {
+                    int option = JOptionPane.showOptionDialog(
+                    this,
+                    "Bạn đã chiến thắng! Bạn có muốn chơi lại không?",
+                    "Chúc mừng",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    new String[]{"Play Again", "Exit"},
+                    "Play Again"
+                    );       
+                    if (option == JOptionPane.YES_OPTION) {
+                        playAgain();
+                    } else {
+                        System.exit(0);
                     }
-
-		}
-	}
+                }
+            }
+        }
+        
+        private void playAgain() {
+        SudokuPuzzle newPuzzle = new SudokuGenerator().generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
+        newSudokuPuzzle(newPuzzle);
+        currentlySelectedCol = -1;
+        currentlySelectedRow = -1;
+        repaint();
+    }
+        
 	
 	public class NumActionListener implements ActionListener {
 		@Override
