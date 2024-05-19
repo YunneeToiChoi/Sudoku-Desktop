@@ -120,8 +120,12 @@ public class SudokuPanel extends JPanel{
 
             puzzle.board[row][col] = "";
             repaint();
+                }
         }
-}
+        
+        public void resetMoveHistory() {
+            moveHistory.clear();
+        }
         
 	//Use to draw grid layout
 	@Override
@@ -236,6 +240,7 @@ public class SudokuPanel extends JPanel{
         currentlySelectedCol = -1;
         currentlySelectedRow = -1;
         startTimer();
+        resetMoveHistory();
         repaint();
     }
         

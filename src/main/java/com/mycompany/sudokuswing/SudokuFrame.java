@@ -91,11 +91,12 @@ public final class SudokuFrame extends JFrame {
         
         //Create undo
         undoButton = new JButton("Undo");
-        undoButton.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-              sPanel.undoMove();
-          }
-      });
+        createUndoAction();
+//        undoButton.addActionListener(new ActionListener() {
+//          public void actionPerformed(ActionEvent e) {
+//              sPanel.undoMove();
+//          }
+//      });
         
         //Add this to frame
         windowPanel.add(sPanel);
@@ -108,6 +109,15 @@ public final class SudokuFrame extends JFrame {
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
 
     }
+    
+    private void createUndoAction() {
+        undoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                sPanel.undoMove();
+            }
+        });
+    }
+
     
     
     public void updateMistakeLabel(int mistakes) {
@@ -141,6 +151,7 @@ public final class SudokuFrame extends JFrame {
         }
         sPanel.repaint();
         sPanel.startTimer();
+        sPanel.resetMoveHistory();
         buttonSelectionPanel.revalidate();
         buttonSelectionPanel.repaint();
     }
