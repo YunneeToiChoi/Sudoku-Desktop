@@ -11,14 +11,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
+import java.util.Stack;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 
 
 
 public class SudokuPanel extends JPanel{
+    
+    private SudokuFrame frame;
     
     //Attribute
     private SudokuPuzzle puzzle;
@@ -27,7 +31,11 @@ public class SudokuPanel extends JPanel{
 	private int usedWidth;
 	private int usedHeight;
 	private int fontSize;
-        
+        private int mistake;
+        private Timer timer;
+        private int secondsPassed = 0;
+        private Stack<int[]> moveHistory = new Stack<>();
+
 	//Contructor
 	public SudokuPanel() {
 		this.setPreferredSize(new Dimension(540,450));
@@ -59,6 +67,61 @@ public class SudokuPanel extends JPanel{
 	public void setFontSize(int fontSize) {
 		this.fontSize = fontSize;
 	}
+        
+        public void setFrame(SudokuFrame frame) {
+                this.frame = frame;
+        }
+        
+        
+        public void resetMistakes() {
+            this.mistake = 0;
+            if (frame != null) {
+                frame.updateMistakeLabel(mistake);
+            }
+        }
+        
+        public void resetTimer() {
+            stopTimer();  
+            secondsPassed = 0; 
+            updateTimerDisplay();  
+        }
+
+
+        public void startTimer() {
+            resetTimer();  
+            timer = new Timer(1000, e -> {
+                secondsPassed++;
+                updateTimerDisplay();
+            });
+            timer.start();
+        }
+
+
+        public void stopTimer() {
+            if (timer != null) {
+                timer.stop();
+            }
+        }
+
+        private void updateTimerDisplay() {
+            int minutes = secondsPassed / 60;
+            int seconds = secondsPassed % 60;
+            String timeFormatted = String.format("%02d:%02d", minutes, seconds);
+            if (frame != null) {
+                frame.updateTimerLabel(timeFormatted); 
+            }
+        }
+        
+        public void undoMove() {
+        if (!moveHistory.isEmpty()) {
+            int[] lastMove = moveHistory.pop();
+            int row = lastMove[0];
+            int col = lastMove[1];
+
+            puzzle.board[row][col] = "";
+            repaint();
+        }
+}
         
 	//Use to draw grid layout
 	@Override
@@ -123,9 +186,29 @@ public class SudokuPanel extends JPanel{
 		}
 	}
         
+                
+        public void gameOver(int mistake){
+            if (mistake == 3) {
+                JOptionPane.showMessageDialog(this, "Game Over!", "Error", JOptionPane.OK_OPTION);
+                playAgain();
+                this.mistake = 0; // Reset mistake
+                if (frame != null) {
+                    frame.updateMistakeLabel(this.mistake); 
+                }
+            }
+        }
+       
+        
         public void messageFromNumActionListener(String buttonValue) {
+            if (!puzzle.isValidMove(currentlySelectedRow, currentlySelectedCol, buttonValue)) {             
+                        mistake++;
+                        frame.updateMistakeLabel(mistake);
+                        gameOver(mistake);
+            }
             if (currentlySelectedCol != -1 && currentlySelectedRow != -1) {
                 puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
+                moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
+    
                 repaint();
                 if (puzzle.boardFull()) {
                     int option = JOptionPane.showOptionDialog(
@@ -152,6 +235,7 @@ public class SudokuPanel extends JPanel{
         newSudokuPuzzle(newPuzzle);
         currentlySelectedCol = -1;
         currentlySelectedRow = -1;
+        startTimer();
         repaint();
     }
         

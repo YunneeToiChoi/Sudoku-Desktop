@@ -64,7 +64,7 @@ public class SudokuPuzzle {
 	public String [] getValidValues() {
 		return this.VALIDVALUES;
 	}
-        
+                  
 	//Fill value in box
 	public void makeMove(int row,int col,String value,boolean isMutable) {
 		if(this.isValidValue(value) && this.isValidMove(row,col,value) && this.isSlotMutable(row, col)) {
