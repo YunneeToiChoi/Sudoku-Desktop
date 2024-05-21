@@ -22,7 +22,7 @@ public class SudokuGenerator {
 		List<String> notUsedValidValues =  new ArrayList<> (Arrays.asList(copy.getValidValues()));
 		for(int r = 0;r < copy.getNumRows();r++) {
 			int randomValue = randomGenerator.nextInt(notUsedValidValues.size());
-			copy.makeMove(r, 0, notUsedValidValues.get(randomValue), true);
+			copy.makeMove(r, 0, notUsedValidValues.get(randomValue), false);
 			notUsedValidValues.remove(randomValue);
 		}
                 
@@ -47,7 +47,7 @@ public class SudokuGenerator {
 			int randomRow = randomGenerator.nextInt(puzzle.getNumRows());
 			int randomColumn = randomGenerator.nextInt(puzzle.getNumColumns());
 			if(puzzle.isSlotAvailable(randomRow, randomColumn)) {
-				puzzle.makeMove(randomRow, randomColumn, copy.getValue(randomRow, randomColumn), true);
+				puzzle.makeMove(randomRow, randomColumn, copy.getValue(randomRow, randomColumn), false);
 				i++;
 			}
 		}
