@@ -4,9 +4,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 
@@ -20,12 +17,16 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
 
 @SuppressWarnings("serial")
 public final class SudokuFrame extends JFrame {
 
     private final JPanel buttonSelectionPanel;
     private final SudokuPanel sPanel;
+    private JLabel lTimerJLabel;
+    private JLabel mistakeJLabel;
+    private JButton undoButton ;
 
     public SudokuFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,7 +54,7 @@ public final class SudokuFrame extends JFrame {
         medium.setActionCommand("Medium");
         JRadioButton hard = new JRadioButton("Hard");
         hard.setActionCommand("Hard");
-
+        
         //Add this to menu
         newGame.add(sixBySixGame);
         newGame.add(nineByNineGame);
@@ -77,24 +78,63 @@ public final class SudokuFrame extends JFrame {
         //Create button
         buttonSelectionPanel = new JPanel();
         buttonSelectionPanel.setPreferredSize(new Dimension(200, 500));
-
+        
         //Create SudokuPanel
         sPanel = new SudokuPanel();
+        sPanel.setFrame(this);
 
+        // Create counting time
+        lTimerJLabel = new JLabel("00:00");
+        
+        //Create mistake
+        mistakeJLabel = new JLabel("Mistakes: 0/3");
+        
+        //Create undo
+        undoButton = new JButton("Undo");
+        createUndoAction();
+//        undoButton.addActionListener(new ActionListener() {
+//          public void actionPerformed(ActionEvent e) {
+//              sPanel.undoMove();
+//          }
+//      });
+        
         //Add this to frame
         windowPanel.add(sPanel);
         windowPanel.add(buttonSelectionPanel);
+        windowPanel.add(lTimerJLabel);    
+        windowPanel.add(mistakeJLabel);
+        windowPanel.add(undoButton);
         this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
 
     }
+    
+    private void createUndoAction() {
+        undoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                sPanel.undoMove();
+            }
+        });
+    }
 
-    //Like above
+    
+    
+    public void updateMistakeLabel(int mistakes) {
+           mistakeJLabel.setText("Mistakes: " + mistakes + "/3");
+    }
+    
+    public void updateTimerLabel(String time) {
+        lTimerJLabel.setText(time);
+    }
+
+
+//    //Like above
     public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
         SudokuPuzzle generatedPuzzle = new SudokuGenerator().generateRandomSudoku(puzzleType, group.getSelection().getActionCommand());
         sPanel.newSudokuPuzzle(generatedPuzzle);
         sPanel.setFontSize(fontSize);
+        sPanel.resetMistakes() ;
         buttonSelectionPanel.removeAll();
         for (String value : generatedPuzzle.getValidValues()) {
             JButton b = new JButton(value);
@@ -110,6 +150,8 @@ public final class SudokuFrame extends JFrame {
             buttonSelectionPanel.add(b);
         }
         sPanel.repaint();
+        sPanel.startTimer();
+        sPanel.resetMoveHistory();
         buttonSelectionPanel.revalidate();
         buttonSelectionPanel.repaint();
     }
@@ -132,7 +174,7 @@ public final class SudokuFrame extends JFrame {
             rebuildInterface(puzzleType, fontSize, mode);
         }
     }
-
+    
     //Main: use to run this frame
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
