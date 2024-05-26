@@ -173,13 +173,21 @@ public class SudokuPanel extends JPanel{
 		Font f = new Font("Times New Roman", Font.PLAIN, fontSize);
 		g2d.setFont(f);
 		FontRenderContext fContext = g2d.getFontRenderContext();
+                g2d.setColor(Color.BLACK);
 		for(int row=0;row < puzzle.getNumRows();row++) {
 			for(int col=0;col < puzzle.getNumColumns();col++) {
+                                String value = puzzle.getValue(row, col);
 				if(!puzzle.isSlotAvailable(row, col)) {
 					int textWidth = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getWidth();
 					int textHeight = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getHeight();
+                                         if (puzzle.isSlotMutable(row, col)) {
+                                            g2d.setColor(Color.BLUE);
+                                        }
+                                        else {
+                                            g2d.setColor(Color.BLACK);
+                                        }
 					g2d.drawString(puzzle.getValue(row, col), (col*slotWidth)+((slotWidth/2)-(textWidth/2)), (row*slotHeight)+((slotHeight/2)+(textHeight/2)));
-				}
+                                    }
 			}
 		}
                 
@@ -202,6 +210,10 @@ public class SudokuPanel extends JPanel{
             }
         }
        
+        private void updateCellColor(int row, int col, Color color) {
+            puzzle.setCellColor(row, col, color);
+        }
+        
         
         public void messageFromNumActionListener(String buttonValue) {
             if (!puzzle.isValidMove(currentlySelectedRow, currentlySelectedCol, buttonValue)) {             
@@ -248,7 +260,14 @@ public class SudokuPanel extends JPanel{
 	public class NumActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			messageFromNumActionListener(((JButton) e.getSource()).getText());	
+                        String buttonValue = ((JButton) e.getSource()).getText();
+			messageFromNumActionListener(buttonValue);	
+                        if (currentlySelectedCol != -1 && currentlySelectedRow != -1) {
+                        puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
+                        updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.BLUE); // Cập nhật màu của ô
+                        moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
+                        repaint();
+                    }
 		}
 	}
 	

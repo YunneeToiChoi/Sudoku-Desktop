@@ -9,7 +9,6 @@ import java.util.Random;
 //TO DO: Create method getSolvedSudoku to compare with btnValue
 
 public class SudokuGenerator {
-    public SudokuPuzzle solvedSudoku;
     
     //Create random sudoku
     //String mode
@@ -28,7 +27,6 @@ public class SudokuGenerator {
                 
 		//Resolve this
 		backtrackSudokuSolver(0, 0, copy);
-                
 		//random number to keep
                 //Optional: can be add if according to mode(easy,medium,hard) instead of 0.55555555
                 int numberOfValuesToKeep;
@@ -53,7 +51,6 @@ public class SudokuGenerator {
 		}
 		return puzzle;
 	}
-    
 	/**
 	 * Solves the Sudoku puzzle
 	 * @param r: the current row
@@ -81,9 +78,7 @@ public class SudokuGenerator {
 					
 					//if puzzle solved return true
 					if(puzzle.boardFull()) {
-                                            solvedSudoku = puzzle;
-                                            //Result
-                                            System.out.println(solvedSudoku);
+                                            System.out.println(puzzle);
                                             return true;
 					}
 					
@@ -109,10 +104,9 @@ public class SudokuGenerator {
 		
 		//undo move
 		puzzle.makeSlotEmpty(r, c);
-                
 		//backtrack
 		return false;
 	}
 
+    }
 
-}

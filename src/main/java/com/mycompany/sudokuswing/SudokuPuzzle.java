@@ -1,15 +1,19 @@
 package com.mycompany.sudokuswing;
 
+import java.awt.Color;
+
 public class SudokuPuzzle {
     
     //Attribute
     protected String [][] board;
 	protected boolean [][] mutable;
+        protected Color[][] cellColors;
 	private final int ROWS;
 	private final int COLUMNS;
 	private final int BOXWIDTH;
 	private final int BOXHEIGHT;
 	private final String [] VALIDVALUES;
+        private String[][] solution;
 	
         //Contructor
 	public SudokuPuzzle(int rows,int columns,int boxWidth,int boxHeight,String [] validValues) {
@@ -20,8 +24,10 @@ public class SudokuPuzzle {
 		this.VALIDVALUES = validValues;
 		this.board = new String[ROWS][COLUMNS];
 		this.mutable = new boolean[ROWS][COLUMNS];
+                this.cellColors = new Color[ROWS][COLUMNS];
 		initializeBoard();
 		initializeMutableSlots();
+                initializeCellColors();
 	}
 	
 	public SudokuPuzzle(SudokuPuzzle puzzle) {
@@ -42,6 +48,13 @@ public class SudokuPuzzle {
 				this.mutable[r][c] = puzzle.mutable[r][c];
 			}
 		}
+                this.cellColors = new Color[ROWS][COLUMNS];
+                for (int r = 0; r < ROWS; r++) {
+                    for (int c = 0; c < COLUMNS; c++) {
+                        this.mutable[r][c] = puzzle.mutable[r][c];
+                        this.cellColors[r][c] = puzzle.cellColors[r][c];
+                    }
+                }
 	}
         
 	//Getter
@@ -64,12 +77,30 @@ public class SudokuPuzzle {
 	public String [] getValidValues() {
 		return this.VALIDVALUES;
 	}
+        
+        public void setCellColor(int row, int col, Color color) {
+            if (inRange(row, col)) {
+                cellColors[row][col] = color;
+            }
+        }
+        
+        public Color getCellColor(int row, int col) {
+            if (inRange(row, col)) {
+                return cellColors[row][col];
+            }
+            return Color.WHITE; // Trả về màu mặc định nếu không hợp lệ
+    }
                   
 	//Fill value in box
 	public void makeMove(int row,int col,String value,boolean isMutable) {
 		if(this.isValidValue(value) && this.isValidMove(row,col,value) && this.isSlotMutable(row, col)) {
 			this.board[row][col] = value;
 			this.mutable[row][col] = isMutable;
+                    if (this.isValidMove(row, col, value)) {
+                        this.setCellColor(row, col, Color.GREEN);
+                    } else {
+                        this.setCellColor(row, col, Color.RED);
+                    }
 		}
 	}
 	//Check can fill or not
@@ -81,7 +112,7 @@ public class SudokuPuzzle {
 		}
 		return false;
 	}
-	
+        
 	public boolean numInCol(int col,String value) {
 		if(col <= this.COLUMNS) {
 			for(int row=0;row < this.ROWS;row++) {
@@ -165,6 +196,14 @@ public class SudokuPuzzle {
 	public void makeSlotEmpty(int row,int col) {
 		this.board[row][col] = "";
 	}
+        
+        public void setSolution(String[][] solution) {
+        this.solution = solution;
+        }
+
+        public String[][] getSolution() {
+            return this.solution;
+        }
 	
 	@Override
 	public String toString() {
@@ -193,4 +232,12 @@ public class SudokuPuzzle {
 			}
 		}
 	}
-}
+        
+        private void initializeCellColors() {
+            for (int row = 0; row < this.ROWS; row++) {
+                for (int col = 0; col < this.COLUMNS; col++) {
+                    this.cellColors[row][col] = Color.WHITE;
+                }
+            }
+        }
+    }
