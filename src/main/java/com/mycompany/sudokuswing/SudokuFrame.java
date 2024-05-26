@@ -1,7 +1,10 @@
 package com.mycompany.sudokuswing;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
@@ -18,6 +21,8 @@ import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public final class SudokuFrame extends JFrame {
@@ -27,11 +32,15 @@ public final class SudokuFrame extends JFrame {
     private JLabel lTimerJLabel;
     private JLabel mistakeJLabel;
     private JButton undoButton ;
+    private JButton delete;
+    private final JPanel notePanel;
+    private JTextField[][] cells;
+
 
     public SudokuFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Sudoku");
-        this.setMinimumSize(new Dimension(800, 600));
+        this.setMinimumSize(new Dimension(1000, 600));
         //Create menuBar
         JMenuBar menuBar = new JMenuBar();
 
@@ -72,12 +81,25 @@ public final class SudokuFrame extends JFrame {
 
         //Create Panel
         JPanel windowPanel = new JPanel();
-        windowPanel.setLayout(new FlowLayout());
-        windowPanel.setPreferredSize(new Dimension(800, 600));
+        windowPanel.setLayout(new BorderLayout());
+        windowPanel.setPreferredSize(new Dimension(1000, 600));
+        
+        //Bottom Panel
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.setPreferredSize(new Dimension(500,50));
+        
+        //Right Panel
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout());
+        JPanel nullPanel = new JPanel();
+        nullPanel.setLayout(new FlowLayout());
+        
 
         //Create button
         buttonSelectionPanel = new JPanel();
         buttonSelectionPanel.setPreferredSize(new Dimension(200, 500));
+        
         
         //Create SudokuPanel
         sPanel = new SudokuPanel();
@@ -85,6 +107,9 @@ public final class SudokuFrame extends JFrame {
 
         // Create counting time
         lTimerJLabel = new JLabel("00:00");
+        lTimerJLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Font font = new Font("Time New Roman", Font.PLAIN, 30);
+        lTimerJLabel.setFont(font);
         
         //Create mistake
         mistakeJLabel = new JLabel("Mistakes: 0/3");
@@ -98,17 +123,40 @@ public final class SudokuFrame extends JFrame {
 //          }
 //      });
         
+        
+        //
+        notePanel = new JPanel();
+        notePanel.setPreferredSize(new Dimension(200,200));
+        
+        JLabel noteTitle = new JLabel("Press ENTER to take notes !");
+        noteTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
+        
+
+        delete = new JButton("Delete");
+        createDeleteAction();
+        
+        
+        nullPanel.add(notePanel);
+        rightPanel.add(nullPanel,BorderLayout.CENTER);
+        rightPanel.add(noteTitle,BorderLayout.NORTH);
+        //
+        bottomPanel.add(mistakeJLabel);
+        bottomPanel.add(delete);
+        bottomPanel.add(undoButton);
         //Add this to frame
-        windowPanel.add(sPanel);
-        windowPanel.add(buttonSelectionPanel);
-        windowPanel.add(lTimerJLabel);    
-        windowPanel.add(mistakeJLabel);
-        windowPanel.add(undoButton);
+        windowPanel.add(sPanel,BorderLayout.CENTER);
+        windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
+        windowPanel.add(rightPanel, BorderLayout.EAST);
+        windowPanel.add(lTimerJLabel,BorderLayout.NORTH);    
+        windowPanel.add(bottomPanel,BorderLayout.SOUTH);
+        
         this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
 
     }
+
     
     private void createUndoAction() {
         undoButton.addActionListener(new ActionListener() {
@@ -127,14 +175,24 @@ public final class SudokuFrame extends JFrame {
     public void updateTimerLabel(String time) {
         lTimerJLabel.setText(time);
     }
+    
+    public void createDeleteAction(){
+        delete.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sPanel.deleteValue();
+            }
+        });
+    }
+
 
 
 //    //Like above
-    public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
+   public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
         SudokuPuzzle generatedPuzzle = new SudokuGenerator().generateRandomSudoku(puzzleType, group.getSelection().getActionCommand());
         sPanel.newSudokuPuzzle(generatedPuzzle);
         sPanel.setFontSize(fontSize);
-        sPanel.resetMistakes() ;
+        sPanel.resetMistakes();
         buttonSelectionPanel.removeAll();
         for (String value : generatedPuzzle.getValidValues()) {
             JButton b = new JButton(value);
@@ -149,12 +207,47 @@ public final class SudokuFrame extends JFrame {
             });
             buttonSelectionPanel.add(b);
         }
+        
+        
+        //take note
+        notePanel.setLayout(new GridLayout(generatedPuzzle.getNumRows(),generatedPuzzle.getNumColumns()));
+        cells = new JTextField[generatedPuzzle.getNumRows()][generatedPuzzle.getNumColumns()];
+        notePanel.removeAll();
+        for (int i = 0; i < generatedPuzzle.getNumRows(); i++) {
+            for (int j = 0; j < generatedPuzzle.getNumColumns(); j++) {
+                cells[i][j] = new JTextField();
+                cells[i][j].setEditable(false);
+                notePanel.add(cells[i][j]);
+            }
+            
+        }
+        for (int i = 0; i < generatedPuzzle.getNumRows(); i++) {
+            for (int j = 0; j < generatedPuzzle.getNumColumns(); j++) {
+                cells[i][j].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JTextField source = (JTextField) e.getSource();
+                        String oldNote = source.getText();
+                        // Hiển thị hộp thoại để nhập ghi chú
+                        String note = JOptionPane.showInputDialog(new SudokuFrame(), "Ghi chú: " + oldNote, "Ghi chú ô Sudoku", JOptionPane.PLAIN_MESSAGE);
+                        if (note != null) {
+                            source.setText(oldNote + note);
+                        }  
+                    }
+                });
+            }
+        }
+        
         sPanel.repaint();
         sPanel.startTimer();
         sPanel.resetMoveHistory();
         buttonSelectionPanel.revalidate();
         buttonSelectionPanel.repaint();
+        notePanel.revalidate();
+        notePanel.repaint();
+        
     }
+
 
     //Create new game with option(SudokuPuzzleType(6x6,9x9,12x12))
     private class NewGameListener implements ActionListener {

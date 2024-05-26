@@ -127,6 +127,24 @@ public class SudokuPanel extends JPanel{
             moveHistory.clear();
         }
         
+        public void deleteValue(){
+            if (!moveHistory.isEmpty()) {
+                int[] move = moveHistory.pop();
+                for (int row = 0; row < move.length; row+=2) {
+                    for (int col = 1; col < move.length; col+=2) {
+                        int r = move[row];
+                        int c = move[col];
+                        if (puzzle.board[currentlySelectedRow][currentlySelectedCol].equals(puzzle.board[r][c])) {
+                            puzzle.board[currentlySelectedRow][currentlySelectedCol] = "";
+                             repaint();
+                        }
+                    }
+                }
+            }
+            
+        }
+
+        
 	//Use to draw grid layout
 	@Override
 	protected void paintComponent(Graphics g) {
