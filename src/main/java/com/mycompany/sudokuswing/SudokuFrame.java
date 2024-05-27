@@ -35,6 +35,7 @@ public final class SudokuFrame extends JFrame {
     private JButton delete;
     private final JPanel notePanel;
     private JTextField[][] cells;
+    private JButton btnTakeNote;
 
 
     public SudokuFrame() {
@@ -131,7 +132,8 @@ public final class SudokuFrame extends JFrame {
         JLabel noteTitle = new JLabel("Press ENTER to take notes !");
         noteTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         
-        
+        btnTakeNote = new JButton("Take Note");
+        createTakeNoteAction();
 
         delete = new JButton("Delete");
         createDeleteAction();
@@ -144,6 +146,7 @@ public final class SudokuFrame extends JFrame {
         bottomPanel.add(mistakeJLabel);
         bottomPanel.add(delete);
         bottomPanel.add(undoButton);
+        bottomPanel.add(btnTakeNote);
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
         windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
@@ -185,6 +188,14 @@ public final class SudokuFrame extends JFrame {
         });
     }
 
+    public void createTakeNoteAction(){
+        btnTakeNote.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cells[sPanel.getCurrentlySelectedRow()][sPanel.getCurrentlySelectedCol()].requestFocus();
+            }
+        });
+    }
 
 
 //    //Like above

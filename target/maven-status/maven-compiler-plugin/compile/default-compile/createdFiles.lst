@@ -20,6 +20,7 @@ loginandsignup\SignUp.class
 loginandsignup\VerifyCode$1.class
 loginandsignup\VerifyCode$2.class
 com\mycompany\sudokuswing\SudokuFrame$4.class
+com\mycompany\sudokuswing\SudokuFrame$6.class
 Database\DatabaseConnector.class
 com\mycompany\sudokuswing\SudokuFrame$1.class
 com\mycompany\sudokuswing\SudokuPanel$NumActionListener.class

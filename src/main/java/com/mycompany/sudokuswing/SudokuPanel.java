@@ -71,6 +71,14 @@ public class SudokuPanel extends JPanel{
         public void setFrame(SudokuFrame frame) {
                 this.frame = frame;
         }
+
+        public int getCurrentlySelectedCol() {
+            return currentlySelectedCol;
+        }
+
+        public int getCurrentlySelectedRow() {
+            return currentlySelectedRow;
+        }
         
         
         public void resetMistakes() {
