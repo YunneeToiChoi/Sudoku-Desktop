@@ -11,7 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
+import java.util.Random;
 import java.util.Stack;
+import javax.management.StringValueExp;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -150,6 +152,16 @@ public class SudokuPanel extends JPanel{
                 }
             }
             
+        }
+        
+        public void autoFill(){
+            for (int i = 1; i < 10; i++) {
+                String value = String.valueOf(i);
+                if (currentlySelectedCol != -1 && currentlySelectedRow != -1) {
+                    puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, value, true);
+                    repaint();
+                }
+            }
         }
 
         

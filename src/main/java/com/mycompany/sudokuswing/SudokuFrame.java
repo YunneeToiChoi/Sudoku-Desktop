@@ -36,6 +36,7 @@ public final class SudokuFrame extends JFrame {
     private final JPanel notePanel;
     private JTextField[][] cells;
     private JButton btnTakeNote;
+    private JButton btnHint;
 
 
     public SudokuFrame() {
@@ -138,6 +139,9 @@ public final class SudokuFrame extends JFrame {
         delete = new JButton("Delete");
         createDeleteAction();
         
+        btnHint = new JButton("Hint");
+        createHintAction();
+        
         
         nullPanel.add(notePanel);
         rightPanel.add(nullPanel,BorderLayout.CENTER);
@@ -147,6 +151,7 @@ public final class SudokuFrame extends JFrame {
         bottomPanel.add(delete);
         bottomPanel.add(undoButton);
         bottomPanel.add(btnTakeNote);
+        bottomPanel.add(btnHint);
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
         windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
@@ -197,6 +202,14 @@ public final class SudokuFrame extends JFrame {
         });
     }
 
+    public void createHintAction(){
+        btnHint.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sPanel.autoFill();
+            }
+        });
+    }
 
 //    //Like above
    public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
