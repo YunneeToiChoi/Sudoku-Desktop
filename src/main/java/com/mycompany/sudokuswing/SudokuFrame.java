@@ -1,10 +1,12 @@
 package com.mycompany.sudokuswing;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 
 import javax.swing.JButton;
@@ -31,7 +33,7 @@ public final class SudokuFrame extends JFrame {
     public SudokuFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Sudoku");
-        this.setMinimumSize(new Dimension(800, 600));
+        this.setMinimumSize(new Dimension(1200, 800));
         //Create menuBar
         JMenuBar menuBar = new JMenuBar();
 
@@ -77,7 +79,7 @@ public final class SudokuFrame extends JFrame {
 
         //Create button
         buttonSelectionPanel = new JPanel();
-        buttonSelectionPanel.setPreferredSize(new Dimension(200, 500));
+        buttonSelectionPanel.setPreferredSize(new Dimension(200, 200));
         
         //Create SudokuPanel
         sPanel = new SudokuPanel();
@@ -97,13 +99,19 @@ public final class SudokuFrame extends JFrame {
 //              sPanel.undoMove();
 //          }
 //      });
-        
+        JPanel child = new JPanel();
+        JPanel tools = new JPanel();
+        tools.setPreferredSize(new Dimension(200, 300));
+        BoxLayout boxLayout = new BoxLayout(tools, BoxLayout.Y_AXIS);
+        tools.add(buttonSelectionPanel);
+        child.add(lTimerJLabel);
+        child.add(mistakeJLabel);
+        child.add(undoButton);
+        tools.add(child);
+        tools.setLayout(boxLayout);
         //Add this to frame
         windowPanel.add(sPanel);
-        windowPanel.add(buttonSelectionPanel);
-        windowPanel.add(lTimerJLabel);    
-        windowPanel.add(mistakeJLabel);
-        windowPanel.add(undoButton);
+        windowPanel.add(tools);
         this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
