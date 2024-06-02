@@ -34,9 +34,10 @@ public final class SudokuFrame extends JFrame {
     private JButton undoButton ;
     private JButton delete;
     private final JPanel notePanel;
-    private JTextField[][] cells;
+    public JTextField[][] cells;
     private JButton btnTakeNote;
     private JButton btnHint;
+    private JLabel lbHint;
 
 
     public SudokuFrame() {
@@ -139,6 +140,8 @@ public final class SudokuFrame extends JFrame {
         delete = new JButton("Delete");
         createDeleteAction();
         
+        lbHint = new JLabel("Hint: 0/5");
+        
         btnHint = new JButton("Hint");
         createHintAction();
         
@@ -152,6 +155,7 @@ public final class SudokuFrame extends JFrame {
         bottomPanel.add(undoButton);
         bottomPanel.add(btnTakeNote);
         bottomPanel.add(btnHint);
+        bottomPanel.add(lbHint);
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
         windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
@@ -197,7 +201,12 @@ public final class SudokuFrame extends JFrame {
         btnTakeNote.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                cells[sPanel.getCurrentlySelectedRow()][sPanel.getCurrentlySelectedCol()].requestFocus();
+                if (sPanel.getCurrentlySelectedRow() == -1 && sPanel.getCurrentlySelectedCol() == -1) {
+                    JOptionPane.showMessageDialog(sPanel, "Mời chọn ô để ghi chú");
+                }else{
+                    JOptionPane.showMessageDialog(sPanel, "Nhấn Enter để ghi chú ô");
+                    cells[sPanel.getCurrentlySelectedRow()][sPanel.getCurrentlySelectedCol()].requestFocus();
+                }
             }
         });
     }
@@ -206,9 +215,18 @@ public final class SudokuFrame extends JFrame {
         btnHint.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                sPanel.autoFill();
+                if (sPanel.hint < 5) {
+                    sPanel.autoFill();
+                }else{
+                    JOptionPane.showMessageDialog(sPanel, "Đã hết số lần gợi ý");
+                }
+                
             }
         });
+    }
+    
+    public void updateHint(int hint){
+        lbHint.setText("Hint: " + hint + "/5");
     }
 
 //    //Like above
@@ -252,8 +270,7 @@ public final class SudokuFrame extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         JTextField source = (JTextField) e.getSource();
                         String oldNote = source.getText();
-                        // Hiển thị hộp thoại để nhập ghi chú
-                        String note = JOptionPane.showInputDialog(new SudokuFrame(), "Ghi chú: " + oldNote, "Ghi chú ô Sudoku", JOptionPane.PLAIN_MESSAGE);
+                        String note = JOptionPane.showInputDialog(sPanel, "Ghi chú: " + oldNote, "Ghi chú ô Sudoku", JOptionPane.PLAIN_MESSAGE);
                         if (note != null) {
                             source.setText(oldNote + note);
                         }  

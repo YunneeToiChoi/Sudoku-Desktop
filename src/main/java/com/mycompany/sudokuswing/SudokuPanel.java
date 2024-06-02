@@ -11,9 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
-import java.util.Random;
 import java.util.Stack;
-import javax.management.StringValueExp;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,6 +35,7 @@ public class SudokuPanel extends JPanel{
         private Timer timer;
         private int secondsPassed = 0;
         private Stack<int[]> moveHistory = new Stack<>();
+        public int hint;
 
 	//Contructor
 	public SudokuPanel() {
@@ -155,11 +154,24 @@ public class SudokuPanel extends JPanel{
         }
         
         public void autoFill(){
+            
             for (int i = 1; i < 10; i++) {
                 String value = String.valueOf(i);
-                if (currentlySelectedCol != -1 && currentlySelectedRow != -1) {
-                    puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, value, true);
-                    repaint();
+                if (!puzzle.emptySlot().isEmpty()) {
+                    if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+                currentlySelectedRow = -1;
+                currentlySelectedCol = -1;
+            }
+                    int[] emptySlot = puzzle.emptySlot().pop();
+                    int row = emptySlot[0];
+                    int col = emptySlot[1];
+                    if (puzzle.isValidMove(row, col, value) && hint < 5) {
+                            puzzle.board[row][col] = value;
+                            repaint();
+                            hint++;
+                            frame.updateHint(hint);
+                            break;
+                    }
                 }
             }
         }
@@ -225,6 +237,7 @@ public class SudokuPanel extends JPanel{
 		if(currentlySelectedCol != -1 && currentlySelectedRow != -1) {
 			g2d.setColor(new Color(0.0f,0.0f,1.0f,0.3f));
 			g2d.fillRect(currentlySelectedCol * slotWidth,currentlySelectedRow * slotHeight,slotWidth,slotHeight);
+                        frame.cells[currentlySelectedRow][currentlySelectedCol].requestFocus();
 		}
 	}
         
