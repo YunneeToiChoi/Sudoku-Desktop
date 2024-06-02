@@ -1,11 +1,14 @@
 package com.mycompany.sudokuswing;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 
@@ -87,30 +90,42 @@ public final class SudokuFrame extends JFrame {
 
         // Create counting time
         lTimerJLabel = new JLabel("00:00");
+        lTimerJLabel.setFont(new Font("Roboto",Font.PLAIN,36));
         
         //Create mistake
         mistakeJLabel = new JLabel("Mistakes: 0/3");
-        
+        mistakeJLabel.setFont(new Font("Roboto",Font.PLAIN,26));
+
         //Create undo
         undoButton = new JButton("Undo");
+        undoButton.setBackground(Color.white);
+        undoButton.setPreferredSize(new Dimension(100, 50));
         createUndoAction();
 //        undoButton.addActionListener(new ActionListener() {
 //          public void actionPerformed(ActionEvent e) {
 //              sPanel.undoMove();
 //          }
 //      });
+        JPanel box = new JPanel();
+        box.add(lTimerJLabel);
+        lTimerJLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lTimerJLabel.setBorder(BorderFactory.createEmptyBorder(0,0,36,0));
+        box.add(sPanel);
+        BoxLayout box1 = new BoxLayout(box, BoxLayout.Y_AXIS);
+        box.setLayout(box1);
         JPanel child = new JPanel();
+        child.setPreferredSize(new Dimension(200, 200));
         JPanel tools = new JPanel();
-        tools.setPreferredSize(new Dimension(200, 300));
+        tools.setPreferredSize(new Dimension(200, 400));
         BoxLayout boxLayout = new BoxLayout(tools, BoxLayout.Y_AXIS);
         tools.add(buttonSelectionPanel);
-        child.add(lTimerJLabel);
+//        child.add(lTimerJLabel);
         child.add(mistakeJLabel);
         child.add(undoButton);
         tools.add(child);
         tools.setLayout(boxLayout);
         //Add this to frame
-        windowPanel.add(sPanel);
+        windowPanel.add(box);
         windowPanel.add(tools);
         this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
@@ -146,6 +161,7 @@ public final class SudokuFrame extends JFrame {
         buttonSelectionPanel.removeAll();
         for (String value : generatedPuzzle.getValidValues()) {
             JButton b = new JButton(value);
+            b.setBackground(Color.white);
             b.setPreferredSize(new Dimension(50, 50));
             b.addActionListener(sPanel.new NumActionListener());
             b.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(value), value);
