@@ -27,6 +27,7 @@ public class SudokuGenerator {
                 
 		//Resolve this
 		backtrackSudokuSolver(0, 0, copy);
+		puzzle.setSolution(copy.getBoard());
 		//random number to keep
                 //Optional: can be add if according to mode(easy,medium,hard) instead of 0.55555555
                 int numberOfValuesToKeep;
@@ -78,8 +79,8 @@ public class SudokuGenerator {
 					
 					//if puzzle solved return true
 					if(puzzle.boardFull()) {
-                                            System.out.println(puzzle);
-                                            return true;
+						System.out.println(puzzle);
+						return true;
 					}
 					
 					//go to next move

@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.util.Stack;
+
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -173,21 +174,21 @@ public class SudokuPanel extends JPanel{
 		Font f = new Font("Times New Roman", Font.PLAIN, fontSize);
 		g2d.setFont(f);
 		FontRenderContext fContext = g2d.getFontRenderContext();
-                g2d.setColor(Color.BLACK);
 		for(int row=0;row < puzzle.getNumRows();row++) {
 			for(int col=0;col < puzzle.getNumColumns();col++) {
-                                String value = puzzle.getValue(row, col);
-				if(!puzzle.isSlotAvailable(row, col)) {
-					int textWidth = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getWidth();
-					int textHeight = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getHeight();
-                                         if (puzzle.isSlotMutable(row, col)) {
-                                            g2d.setColor(Color.BLUE);
-                                        }
-                                        else {
-                                            g2d.setColor(Color.BLACK);
-                                        }
-					g2d.drawString(puzzle.getValue(row, col), (col*slotWidth)+((slotWidth/2)-(textWidth/2)), (row*slotHeight)+((slotHeight/2)+(textHeight/2)));
-                                    }
+                String cellValue = puzzle.getValue(row, col);
+                if (!cellValue.equals("")) {
+                    Color cellColor = puzzle.getCellColor(row, col);
+                    if (cellColor != null) {
+                        g2d.setColor(cellColor);
+                    } else {
+                        g2d.setColor(Color.BLACK); // Default color
+                    }
+                    // Calculate x and y positions for drawing the string
+                    int x = col * usedWidth / 9 + usedWidth / 18;
+                    int y = row * usedHeight / 9 + usedHeight / 18 + g2d.getFontMetrics().getAscent() / 2;
+                    g2d.drawString(cellValue, x, y);
+                }
 			}
 		}
                 
@@ -216,16 +217,17 @@ public class SudokuPanel extends JPanel{
         
         
         public void messageFromNumActionListener(String buttonValue) {
-            if (!puzzle.isValidMove(currentlySelectedRow, currentlySelectedCol, buttonValue)) {             
-                        mistake++;
-                        frame.updateMistakeLabel(mistake);
-                        gameOver(mistake);
+            if (!puzzle.getSolutionValue(currentlySelectedRow, currentlySelectedCol).equals(buttonValue)) {
+                mistake++;
+                frame.updateMistakeLabel(mistake);
+                updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.RED);
+                puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = buttonValue;
+                gameOver(mistake);
             }
-            if (currentlySelectedCol != -1 && currentlySelectedRow != -1) {
+            else{
                 puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
                 moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
-    
-                repaint();
+                updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.BLUE);
                 if (puzzle.boardFull()) {
                     int option = JOptionPane.showOptionDialog(
                     this,
@@ -244,6 +246,7 @@ public class SudokuPanel extends JPanel{
                     }
                 }
             }
+            repaint();
         }
         
         private void playAgain() {
@@ -260,14 +263,8 @@ public class SudokuPanel extends JPanel{
 	public class NumActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-                        String buttonValue = ((JButton) e.getSource()).getText();
-			messageFromNumActionListener(buttonValue);	
-                        if (currentlySelectedCol != -1 && currentlySelectedRow != -1) {
-                        puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
-                        updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.BLUE); // Cập nhật màu của ô
-                        moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
-                        repaint();
-                    }
+            String buttonValue = ((JButton) e.getSource()).getText();
+            messageFromNumActionListener(buttonValue);	
 		}
 	}
 	
