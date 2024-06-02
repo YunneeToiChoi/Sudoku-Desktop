@@ -35,7 +35,7 @@ public class SudokuPanel extends JPanel{
         private int mistake;
         private Timer timer;
         private int secondsPassed = 0;
-        private Stack<int[]> moveHistory = new Stack<>();
+        final private Stack<int[]> moveHistory = new Stack<>();
 
 	//Contructor
 	public SudokuPanel() {

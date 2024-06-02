@@ -31,15 +31,13 @@ public class SudokuGenerator {
 		//random number to keep
                 //Optional: can be add if according to mode(easy,medium,hard) instead of 0.55555555
                 int numberOfValuesToKeep;
-                if(mode.equals("Easy")){
-                    numberOfValuesToKeep = (int)(0.7777777777*(copy.getNumRows()*copy.getNumRows()));
-                }
-                else if (mode.equals("Medium")){
-                    numberOfValuesToKeep = (int)(0.5555555555*(copy.getNumRows()*copy.getNumRows()));
-                }
-                else{
-                    numberOfValuesToKeep = (int)(0.3333333333*(copy.getNumRows()*copy.getNumRows()));
-                }
+                numberOfValuesToKeep = (int) (
+					switch (mode) 
+					{
+						case "Easy" -> 0.7777777777*(copy.getNumRows()*copy.getNumRows());
+						case "Medium" -> 0.5555555555*(copy.getNumRows()*copy.getNumRows());
+						default -> 0.3333333333*(copy.getNumRows()*copy.getNumRows());
+       				});
            
 		//random row and randow col to fill number
 		for(int i = 0;i < numberOfValuesToKeep;) {
@@ -68,29 +66,25 @@ public class SudokuGenerator {
 		//if the current space is empty
 		if(puzzle.isSlotAvailable(r, c)) {
 			
-			//loop to find the correct value for the space
-			for(int i = 0;i < puzzle.getValidValues().length;i++) {
-				
-				//if the current number works in the space
-				if(!puzzle.numInRow(r, puzzle.getValidValues()[i]) && !puzzle.numInCol(c,puzzle.getValidValues()[i]) && !puzzle.numInBox(r,c,puzzle.getValidValues()[i])) {
-					
-					//make the move
-					puzzle.makeMove(r, c, puzzle.getValidValues()[i], true);
-					
-					//if puzzle solved return true
-					if(puzzle.boardFull()) {
-						System.out.println(puzzle);
-						return true;
-					}
-					
-					//go to next move
-					if(r == puzzle.getNumRows() - 1) {
-						if(backtrackSudokuSolver(0,c + 1,puzzle)) return true;
-					} else {
-						if(backtrackSudokuSolver(r + 1,c,puzzle)) return true;
-					}
-				}
-			}
+                    //loop to find the correct value for the space
+                    for (String validValue : puzzle.getValidValues()) {
+                        //if the current number works in the space
+                        if (!puzzle.numInRow(r, validValue) && !puzzle.numInCol(c, validValue) && !puzzle.numInBox(r, c, validValue)) {
+                            //make the move
+                            puzzle.makeMove(r, c, validValue, true);
+                            //if puzzle solved return true
+                            if(puzzle.boardFull()) {
+                                System.out.println(puzzle);
+                                return true;
+                            }
+                            //go to next move
+                            if(r == puzzle.getNumRows() - 1) {
+                                if(backtrackSudokuSolver(0,c + 1,puzzle)) return true;
+                            } else {
+                                if(backtrackSudokuSolver(r + 1,c,puzzle)) return true;
+                            }
+                        }
+                    }
 		}
 		
 		//if the current space is not empty
