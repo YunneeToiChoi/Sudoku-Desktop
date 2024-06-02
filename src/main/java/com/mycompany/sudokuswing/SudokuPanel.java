@@ -185,9 +185,9 @@ public class SudokuPanel extends JPanel{
                         g2d.setColor(Color.BLACK); // Default color
                     }
                     // Calculate x and y positions for drawing the string
-                    int x = col * usedWidth / 9 + usedWidth / 18;
-                    int y = row * usedHeight / 9 + usedHeight / 18 + g2d.getFontMetrics().getAscent() / 2;
-                    g2d.drawString(cellValue, x, y);
+                    int textWidth = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getWidth();
+                    int textHeight = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getHeight();
+                    g2d.drawString(puzzle.getValue(row, col), (col * slotWidth) + ((slotWidth / 2) - (textWidth / 2)), (row * slotHeight) + ((slotHeight / 2) + (textHeight / 2)));
                 }
 			}
 		}
