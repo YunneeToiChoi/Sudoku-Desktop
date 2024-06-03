@@ -5,6 +5,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -23,19 +28,29 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public final class SudokuFrame extends JFrame {
     private final JPanel buttonSelectionPanel;
     private final SudokuPanel sPanel;
-    private final JLabel lTimerJLabel;
-    private final JLabel mistakeJLabel;
-    private final JButton undoButton ;
+    private JLabel lTimerJLabel;
+    private JLabel mistakeJLabel;
+    private JButton undoButton ;
+    private JButton delete;
+    private final JPanel notePanel;
+    public JTextField[][] cells;
+    private JButton btnTakeNote;
+    private JButton btnHint;
+    private JLabel lbHint;
+
 
     public SudokuFrame() {
         SudokuFrame frame = this;
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Sudoku");
-        frame.setMinimumSize(new Dimension(1200, 800));
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Sudoku");
+        this.setMinimumSize(new Dimension(1000, 600));
         //Create menuBar
         JMenuBar menuBar = new JMenuBar();
 
@@ -76,12 +91,25 @@ public final class SudokuFrame extends JFrame {
 
         //Create Panel
         JPanel windowPanel = new JPanel();
-        windowPanel.setLayout(new FlowLayout());
-        windowPanel.setPreferredSize(new Dimension(800, 600));
+        windowPanel.setLayout(new BorderLayout());
+        windowPanel.setPreferredSize(new Dimension(1000, 600));
+        
+        //Bottom Panel
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.setPreferredSize(new Dimension(500,50));
+        
+        //Right Panel
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout());
+        JPanel nullPanel = new JPanel();
+        nullPanel.setLayout(new FlowLayout());
+        
 
         //Create button
         buttonSelectionPanel = new JPanel();
         buttonSelectionPanel.setPreferredSize(new Dimension(200, 200));
+        
         
         //Create SudokuPanel
         sPanel = new SudokuPanel();
@@ -89,7 +117,9 @@ public final class SudokuFrame extends JFrame {
 
         // Create counting time
         lTimerJLabel = new JLabel("00:00");
-        lTimerJLabel.setFont(new Font("Roboto",Font.PLAIN,36));
+        lTimerJLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Font font = new Font("Time New Roman", Font.PLAIN, 30);
+        lTimerJLabel.setFont(font);
         
         //Create mistake
         mistakeJLabel = new JLabel("Mistakes: 0/3");
@@ -105,32 +135,50 @@ public final class SudokuFrame extends JFrame {
 //              sPanel.undoMove();
 //          }
 //      });
-        JPanel box = new JPanel();
-        box.add(lTimerJLabel);
-        lTimerJLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lTimerJLabel.setBorder(BorderFactory.createEmptyBorder(0,0,36,0));
-        box.add(sPanel);
-        BoxLayout box1 = new BoxLayout(box, BoxLayout.Y_AXIS);
-        box.setLayout(box1);
-        JPanel child = new JPanel();
-        child.setPreferredSize(new Dimension(200, 200));
-        JPanel tools = new JPanel();
-        tools.setPreferredSize(new Dimension(200, 400));
-        BoxLayout boxLayout = new BoxLayout(tools, BoxLayout.Y_AXIS);
-        tools.add(buttonSelectionPanel);
-//        child.add(lTimerJLabel);
-        child.add(mistakeJLabel);
-        child.add(undoButton);
-        tools.add(child);
-        tools.setLayout(boxLayout);
+        
+        
+        //
+        notePanel = new JPanel();
+        notePanel.setPreferredSize(new Dimension(200,200));
+        
+        JLabel noteTitle = new JLabel("Press ENTER to take notes !");
+        noteTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
+        btnTakeNote = new JButton("Take Note");
+        createTakeNoteAction();
+
+        delete = new JButton("Delete");
+        createDeleteAction();
+        
+        lbHint = new JLabel("Hint: 0/5");
+        
+        btnHint = new JButton("Hint");
+        createHintAction();
+        
+        
+        nullPanel.add(notePanel);
+        rightPanel.add(nullPanel,BorderLayout.CENTER);
+        rightPanel.add(noteTitle,BorderLayout.NORTH);
+        //
+        bottomPanel.add(mistakeJLabel);
+        bottomPanel.add(delete);
+        bottomPanel.add(undoButton);
+        bottomPanel.add(btnTakeNote);
+        bottomPanel.add(btnHint);
+        bottomPanel.add(lbHint);
         //Add this to frame
-        windowPanel.add(box);
-        windowPanel.add(tools);
-        frame.add(windowPanel);
+        windowPanel.add(sPanel,BorderLayout.CENTER);
+        windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
+        windowPanel.add(rightPanel, BorderLayout.EAST);
+        windowPanel.add(lTimerJLabel,BorderLayout.NORTH);    
+        windowPanel.add(bottomPanel,BorderLayout.SOUTH);
+        
+        this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
 
     }
+
     
     private void createUndoAction() {
         undoButton.addActionListener((ActionEvent e) -> {
@@ -147,14 +195,54 @@ public final class SudokuFrame extends JFrame {
     public void updateTimerLabel(String time) {
         lTimerJLabel.setText(time);
     }
+    
+    public void createDeleteAction(){
+        delete.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sPanel.deleteValue();
+            }
+        });
+    }
 
+    public void createTakeNoteAction(){
+        btnTakeNote.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (sPanel.getCurrentlySelectedRow() == -1 && sPanel.getCurrentlySelectedCol() == -1) {
+                    JOptionPane.showMessageDialog(sPanel, "Mời chọn ô để ghi chú");
+                }else{
+                    JOptionPane.showMessageDialog(sPanel, "Nhấn Enter để ghi chú ô");
+                    cells[sPanel.getCurrentlySelectedRow()][sPanel.getCurrentlySelectedCol()].requestFocus();
+                }
+            }
+        });
+    }
+
+    public void createHintAction(){
+        btnHint.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (sPanel.hint < 5) {
+                    sPanel.autoFill();
+                }else{
+                    JOptionPane.showMessageDialog(sPanel, "Đã hết số lần gợi ý");
+                }
+                
+            }
+        });
+    }
+    
+    public void updateHint(int hint){
+        lbHint.setText("Hint: " + hint + "/5");
+    }
 
 //    //Like above
-    public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
+   public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
         SudokuPuzzle generatedPuzzle = new SudokuGenerator().generateRandomSudoku(puzzleType, group.getSelection().getActionCommand());
         sPanel.newSudokuPuzzle(generatedPuzzle);
         sPanel.setFontSize(fontSize);
-        sPanel.resetMistakes() ;
+        sPanel.resetMistakes();
         buttonSelectionPanel.removeAll();
         for (String value : generatedPuzzle.getValidValues()) {
             JButton b = new JButton(value);
@@ -170,12 +258,46 @@ public final class SudokuFrame extends JFrame {
             });
             buttonSelectionPanel.add(b);
         }
+        
+        
+        //take note
+        notePanel.setLayout(new GridLayout(generatedPuzzle.getNumRows(),generatedPuzzle.getNumColumns()));
+        cells = new JTextField[generatedPuzzle.getNumRows()][generatedPuzzle.getNumColumns()];
+        notePanel.removeAll();
+        for (int i = 0; i < generatedPuzzle.getNumRows(); i++) {
+            for (int j = 0; j < generatedPuzzle.getNumColumns(); j++) {
+                cells[i][j] = new JTextField();
+                cells[i][j].setEditable(false);
+                notePanel.add(cells[i][j]);
+            }
+            
+        }
+        for (int i = 0; i < generatedPuzzle.getNumRows(); i++) {
+            for (int j = 0; j < generatedPuzzle.getNumColumns(); j++) {
+                cells[i][j].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JTextField source = (JTextField) e.getSource();
+                        String oldNote = source.getText();
+                        String note = JOptionPane.showInputDialog(sPanel, "Ghi chú: " + oldNote, "Ghi chú ô Sudoku", JOptionPane.PLAIN_MESSAGE);
+                        if (note != null) {
+                            source.setText(oldNote + note);
+                        }  
+                    }
+                });
+            }
+        }
+        
         sPanel.repaint();
         sPanel.startTimer();
         sPanel.resetMoveHistory();
         buttonSelectionPanel.revalidate();
         buttonSelectionPanel.repaint();
+        notePanel.revalidate();
+        notePanel.repaint();
+        
     }
+
 
     //Create new game with option(SudokuPuzzleType(6x6,9x9,12x12))
     private class NewGameListener implements ActionListener {

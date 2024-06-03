@@ -35,7 +35,8 @@ public class SudokuPanel extends JPanel{
         private int mistake;
         private Timer timer;
         private int secondsPassed = 0;
-        final private Stack<int[]> moveHistory = new Stack<>();
+        private Stack<int[]> moveHistory = new Stack<>();
+        public int hint;
 
 	//Contructor
 	public SudokuPanel() {
@@ -71,6 +72,14 @@ public class SudokuPanel extends JPanel{
         
         public void setFrame(SudokuFrame frame) {
                 this.frame = frame;
+        }
+
+        public int getCurrentlySelectedCol() {
+            return currentlySelectedCol;
+        }
+
+        public int getCurrentlySelectedRow() {
+            return currentlySelectedRow;
         }
         
         
@@ -127,6 +136,47 @@ public class SudokuPanel extends JPanel{
         public void resetMoveHistory() {
             moveHistory.clear();
         }
+        
+        public void deleteValue(){
+            if (!moveHistory.isEmpty()) {
+                int[] move = moveHistory.pop();
+                for (int row = 0; row < move.length; row+=2) {
+                    for (int col = 1; col < move.length; col+=2) {
+                        int r = move[row];
+                        int c = move[col];
+                        if (puzzle.board[currentlySelectedRow][currentlySelectedCol].equals(puzzle.board[r][c])) {
+                            puzzle.board[currentlySelectedRow][currentlySelectedCol] = "";
+                             repaint();
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        public void autoFill(){
+            
+            for (int i = 1; i < 10; i++) {
+                String value = String.valueOf(i);
+                if (!puzzle.emptySlot().isEmpty()) {
+                    if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+                currentlySelectedRow = -1;
+                currentlySelectedCol = -1;
+            }
+                    int[] emptySlot = puzzle.emptySlot().pop();
+                    int row = emptySlot[0];
+                    int col = emptySlot[1];
+                    if (puzzle.isValidMove(row, col, value) && hint < 5) {
+                            puzzle.board[row][col] = value;
+                            repaint();
+                            hint++;
+                            frame.updateHint(hint);
+                            break;
+                    }
+                }
+            }
+        }
+
         
 	//Use to draw grid layout
 	@Override
@@ -196,6 +246,7 @@ public class SudokuPanel extends JPanel{
 		if(currentlySelectedCol != -1 && currentlySelectedRow != -1) {
 			g2d.setColor(new Color(0.0f,0.0f,1.0f,0.3f));
 			g2d.fillRect(currentlySelectedCol * slotWidth,currentlySelectedRow * slotHeight,slotWidth,slotHeight);
+                        frame.cells[currentlySelectedRow][currentlySelectedCol].requestFocus();
 		}
 	}
         

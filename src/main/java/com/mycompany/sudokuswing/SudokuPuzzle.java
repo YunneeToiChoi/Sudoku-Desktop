@@ -1,6 +1,7 @@
 package com.mycompany.sudokuswing;
 
 import java.awt.Color;
+import java.util.Stack;
 
 public class SudokuPuzzle {
     
@@ -151,6 +152,19 @@ public class SudokuPuzzle {
 	public boolean isSlotAvailable(int row,int col) {
 		 return (this.inRange(row,col) && this.board[row][col].equals("") && this.isSlotMutable(row, col));
 	}
+        
+        public Stack<int[]> emptySlot(){
+            Stack<int[]> storage = new Stack<>();
+            for (int r = 0; r < this.ROWS; r++) {
+                for (int c = 0; c < this.COLUMNS; c++) {
+                    if (isSlotAvailable(r, c)) {
+                        int[] arr = new int[]{r,c};
+                        storage.push(arr);
+                    }
+                }
+            }
+            return storage;
+        }
 	
 	public boolean isSlotMutable(int row,int col) {
 		return this.mutable[row][col];
