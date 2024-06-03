@@ -7,14 +7,15 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -22,21 +23,19 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.JLabel;
 
-@SuppressWarnings("serial")
 public final class SudokuFrame extends JFrame {
-
     private final JPanel buttonSelectionPanel;
     private final SudokuPanel sPanel;
-    private JLabel lTimerJLabel;
-    private JLabel mistakeJLabel;
-    private JButton undoButton ;
+    private final JLabel lTimerJLabel;
+    private final JLabel mistakeJLabel;
+    private final JButton undoButton ;
 
     public SudokuFrame() {
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setTitle("Sudoku");
-        this.setMinimumSize(new Dimension(1200, 800));
+        SudokuFrame frame = this;
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setTitle("Sudoku");
+        frame.setMinimumSize(new Dimension(1200, 800));
         //Create menuBar
         JMenuBar menuBar = new JMenuBar();
 
@@ -73,7 +72,7 @@ public final class SudokuFrame extends JFrame {
         file.add(newGame);
         menuBar.add(file);
         menuBar.add(mode);
-        this.setJMenuBar(menuBar);
+        frame.setJMenuBar(menuBar);
 
         //Create Panel
         JPanel windowPanel = new JPanel();
@@ -86,7 +85,7 @@ public final class SudokuFrame extends JFrame {
         
         //Create SudokuPanel
         sPanel = new SudokuPanel();
-        sPanel.setFrame(this);
+        sPanel.setFrame(frame);
 
         // Create counting time
         lTimerJLabel = new JLabel("00:00");
@@ -127,17 +126,15 @@ public final class SudokuFrame extends JFrame {
         //Add this to frame
         windowPanel.add(box);
         windowPanel.add(tools);
-        this.add(windowPanel);
+        frame.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
 
     }
     
     private void createUndoAction() {
-        undoButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                sPanel.undoMove();
-            }
+        undoButton.addActionListener((ActionEvent e) -> {
+            sPanel.undoMove();
         });
     }
 
@@ -185,7 +182,7 @@ public final class SudokuFrame extends JFrame {
 
         private final SudokuPuzzleType puzzleType;
         private final int fontSize;
-        private ButtonGroup mode;
+        private final ButtonGroup mode;
 
         public NewGameListener(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup mode) {
             this.puzzleType = puzzleType;
@@ -201,12 +198,9 @@ public final class SudokuFrame extends JFrame {
     
     //Main: use to run this frame
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SudokuFrame frame = new SudokuFrame();
-                frame.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            SudokuFrame frame = new SudokuFrame();
+            frame.setVisible(true);
         });
     }
 }

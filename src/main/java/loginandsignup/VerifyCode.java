@@ -4,11 +4,13 @@
  */
 package loginandsignup;
 
-import Database.DatabaseConnector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import javax.swing.JOptionPane;
 import java.sql.SQLException;
+
+import javax.swing.JOptionPane;
+
+import Database.DatabaseConnector;
 
 /**
  *
@@ -36,7 +38,6 @@ public class VerifyCode extends javax.swing.JFrame {
     }
 
  
-    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -62,17 +63,13 @@ public class VerifyCode extends javax.swing.JFrame {
         jLabel2.setText("Check your email to get verify code");
 
         btnCancel.setText("Cancel");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
+        btnCancel.addActionListener((java.awt.event.ActionEvent evt) -> {
+            btnCancelActionPerformed();
         });
 
         btnOK.setText("OK");
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
+        btnOK.addActionListener((java.awt.event.ActionEvent evt) -> {
+            btnOKActionPerformed();
         });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -133,8 +130,7 @@ public class VerifyCode extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        // TODO add your handling code here:
+    private void btnOKActionPerformed() {//GEN-FIRST:event_btnOKActionPerformed
         String txtOTP = txtCode.getText();
     
         String insertUser = "INSERT INTO Users (fullname, email, password) VALUES (?, ?, ?)";
@@ -153,7 +149,6 @@ public class VerifyCode extends javax.swing.JFrame {
                    JOptionPane.showMessageDialog(this, "Registration failed!");
                }
            } catch (SQLException e) {
-               e.printStackTrace();
                JOptionPane.showMessageDialog(this, "Error accessing database!");
            }
 
@@ -164,8 +159,7 @@ public class VerifyCode extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnOKActionPerformed
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        // TODO add your handling code here:
+    private void btnCancelActionPerformed() {//GEN-FIRST:event_btnCancelActionPerformed
         backSignUp();
     }//GEN-LAST:event_btnCancelActionPerformed
 
@@ -201,21 +195,15 @@ public class VerifyCode extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VerifyCode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VerifyCode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VerifyCode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(VerifyCode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        //</editor-fold>
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new VerifyCode().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new VerifyCode().setVisible(true);
         });
     }
 
