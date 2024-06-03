@@ -120,8 +120,6 @@ public final class SudokuFrame extends JFrame {
 
         //Create undo
         undoButton = new JButton("Undo");
-        undoButton.setBackground(Color.white);
-        undoButton.setPreferredSize(new Dimension(100, 50));
         createUndoAction();
 //        undoButton.addActionListener(new ActionListener() {
 //          public void actionPerformed(ActionEvent e) {
