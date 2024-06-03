@@ -38,15 +38,11 @@ public class SudokuPuzzle {
 		this.VALIDVALUES = puzzle.VALIDVALUES;
 		this.board = new String[ROWS][COLUMNS];
 		for(int r = 0;r < ROWS;r++) {
-			for(int c = 0;c < COLUMNS;c++) {
-				board[r][c] = puzzle.board[r][c];
-			}
+                    System.arraycopy(puzzle.board[r], 0, board[r], 0, COLUMNS);
 		}
 		this.mutable = new boolean[ROWS][COLUMNS];
 		for(int r = 0;r < ROWS;r++) {
-			for(int c = 0;c < COLUMNS;c++) {
-				this.mutable[r][c] = puzzle.mutable[r][c];
-			}
+                    System.arraycopy(puzzle.mutable[r], 0, this.mutable[r], 0, COLUMNS);
 		}
 		this.cellColors = new Color[ROWS][COLUMNS];
 		for (int r = 0; r < ROWS; r++) {

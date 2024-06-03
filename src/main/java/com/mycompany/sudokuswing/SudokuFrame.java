@@ -1,11 +1,7 @@
 package com.mycompany.sudokuswing;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -14,8 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -24,27 +18,26 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 public final class SudokuFrame extends JFrame {
     private final JPanel buttonSelectionPanel;
     private final SudokuPanel sPanel;
-    private JLabel lTimerJLabel;
-    private JLabel mistakeJLabel;
-    private JButton undoButton ;
-    private JButton delete;
+    private final JLabel lTimerJLabel;
+    private final JLabel mistakeJLabel;
+    private final JButton undoButton ;
+    private final JButton delete;
     private final JPanel notePanel;
+    private final JButton btnTakeNote;
+    private final JButton btnHint;
+    private final JLabel lbHint;
     public JTextField[][] cells;
-    private JButton btnTakeNote;
-    private JButton btnHint;
-    private JLabel lbHint;
-
+   
 
     public SudokuFrame() {
         SudokuFrame frame = this;
@@ -197,38 +190,28 @@ public final class SudokuFrame extends JFrame {
     }
     
     public void createDeleteAction(){
-        delete.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sPanel.deleteValue();
-            }
+        delete.addActionListener((ActionEvent e) -> {
+            sPanel.deleteValue();
         });
     }
 
     public void createTakeNoteAction(){
-        btnTakeNote.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (sPanel.getCurrentlySelectedRow() == -1 && sPanel.getCurrentlySelectedCol() == -1) {
-                    JOptionPane.showMessageDialog(sPanel, "Mời chọn ô để ghi chú");
-                }else{
-                    JOptionPane.showMessageDialog(sPanel, "Nhấn Enter để ghi chú ô");
-                    cells[sPanel.getCurrentlySelectedRow()][sPanel.getCurrentlySelectedCol()].requestFocus();
-                }
+        btnTakeNote.addActionListener((ActionEvent e) -> {
+            if (sPanel.getCurrentlySelectedRow() == -1 && sPanel.getCurrentlySelectedCol() == -1) {
+                JOptionPane.showMessageDialog(sPanel, "Mời chọn ô để ghi chú");
+            }else{
+                JOptionPane.showMessageDialog(sPanel, "Nhấn Enter để ghi chú ô");
+                cells[sPanel.getCurrentlySelectedRow()][sPanel.getCurrentlySelectedCol()].requestFocus();
             }
         });
     }
 
     public void createHintAction(){
-        btnHint.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (sPanel.hint < 5) {
-                    sPanel.autoFill();
-                }else{
-                    JOptionPane.showMessageDialog(sPanel, "Đã hết số lần gợi ý");
-                }
-                
+        btnHint.addActionListener((ActionEvent e) -> {
+            if (sPanel.hint < 5) {
+                sPanel.autoFill();
+            }else{
+                JOptionPane.showMessageDialog(sPanel, "Đã hết số lần gợi ý");
             }
         });
     }
@@ -274,15 +257,12 @@ public final class SudokuFrame extends JFrame {
         }
         for (int i = 0; i < generatedPuzzle.getNumRows(); i++) {
             for (int j = 0; j < generatedPuzzle.getNumColumns(); j++) {
-                cells[i][j].addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JTextField source = (JTextField) e.getSource();
-                        String oldNote = source.getText();
-                        String note = JOptionPane.showInputDialog(sPanel, "Ghi chú: " + oldNote, "Ghi chú ô Sudoku", JOptionPane.PLAIN_MESSAGE);
-                        if (note != null) {
-                            source.setText(oldNote + note);
-                        }  
+                cells[i][j].addActionListener((ActionEvent e) -> {
+                    JTextField source = (JTextField) e.getSource();
+                    String oldNote = source.getText();
+                    String note = JOptionPane.showInputDialog(sPanel, "Ghi chú: " + oldNote, "Ghi chú ô Sudoku", JOptionPane.PLAIN_MESSAGE);
+                    if (note != null) {
+                        source.setText(oldNote + note);  
                     }
                 });
             }
