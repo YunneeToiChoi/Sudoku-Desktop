@@ -8,13 +8,13 @@ public class SudokuPuzzle {
     //Attribute
     protected String [][] board;
 	protected boolean [][] mutable;
-        protected Color[][] cellColors;
+    protected Color[][] cellColors;
 	private final int ROWS;
 	private final int COLUMNS;
 	private final int BOXWIDTH;
 	private final int BOXHEIGHT;
 	private final String [] VALIDVALUES;
-        private String[][] solution;
+    private String[][] solution;
 	
         //Contructor
 	public SudokuPuzzle(int rows,int columns,int boxWidth,int boxHeight,String [] validValues) {

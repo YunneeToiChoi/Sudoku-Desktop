@@ -32,11 +32,11 @@ public class SudokuPanel extends JPanel{
 	private int usedWidth;
 	private int usedHeight;
 	private int fontSize;
-        private int mistake;
-        private Timer timer;
-        private int secondsPassed = 0;
-        private final Stack<int[]> moveHistory = new Stack<>();
-        private int hint;
+    private int mistake;
+    private Timer timer;
+    private int secondsPassed = 0;
+    private final Stack<int[]> moveHistory = new Stack<>();
+    private int hint;
 
 	//Contructor
 	public SudokuPanel() {
@@ -81,7 +81,7 @@ public class SudokuPanel extends JPanel{
         public int getCurrentlySelectedRow() {
             return currentlySelectedRow;
         }
-        
+
         public int getHint() {
             return hint;
         }
@@ -169,6 +169,7 @@ public class SudokuPanel extends JPanel{
                     int col = emptySlot[1];
                     if (puzzle.isValidMove(row, col, value) && hint < 5) {
                             puzzle.board[row][col] = value;
+                            puzzle.setCellColor(row, col, new Color(194,197,29));
                             repaint();
                             hint++;
                             frame.updateHint(hint);
