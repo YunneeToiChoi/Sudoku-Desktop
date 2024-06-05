@@ -35,8 +35,8 @@ public class SudokuPanel extends JPanel{
         private int mistake;
         private Timer timer;
         private int secondsPassed = 0;
-        private Stack<int[]> moveHistory = new Stack<>();
-        public int hint;
+        private final Stack<int[]> moveHistory = new Stack<>();
+        private int hint;
 
 	//Contructor
 	public SudokuPanel() {
@@ -82,6 +82,9 @@ public class SudokuPanel extends JPanel{
             return currentlySelectedRow;
         }
         
+        public int getHint() {
+            return hint;
+        }
         
         public void resetMistakes() {
             this.mistake = 0;
@@ -125,7 +128,7 @@ public class SudokuPanel extends JPanel{
         public void undoMove() {
         if (!moveHistory.isEmpty()) {
             int[] lastMove = moveHistory.pop();
-            int row = lastMove[0];
+            int row = lastMove[0]; 
             int col = lastMove[1];
 
             puzzle.board[row][col] = "";
@@ -138,19 +141,17 @@ public class SudokuPanel extends JPanel{
         }
         
         public void deleteValue(){
-            if (!moveHistory.isEmpty()) {
-                int[] move = moveHistory.pop();
-                for (int row = 0; row < move.length; row+=2) {
-                    for (int col = 1; col < move.length; col+=2) {
-                        int r = move[row];
-                        int c = move[col];
-                        if (puzzle.board[currentlySelectedRow][currentlySelectedCol].equals(puzzle.board[r][c])) {
-                            puzzle.board[currentlySelectedRow][currentlySelectedCol] = "";
-                             repaint();
-                        }
-                    }
+            if(puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol].equals("")){
+                JOptionPane.showMessageDialog(this, "Cell trống");
+            }else{
+                if(!puzzle.getCellColor(currentlySelectedRow, currentlySelectedCol).equals(Color.BLACK)){
+                    puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = "";
+                }
+                else{
+                    JOptionPane.showMessageDialog(this, "Cell đề bài");
                 }
             }
+            repaint();
             
         }
         
@@ -160,9 +161,9 @@ public class SudokuPanel extends JPanel{
                 String value = String.valueOf(i);
                 if (!puzzle.emptySlot().isEmpty()) {
                     if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
-                currentlySelectedRow = -1;
-                currentlySelectedCol = -1;
-            }
+                        currentlySelectedRow = -1;
+                        currentlySelectedCol = -1;
+                    }
                     int[] emptySlot = puzzle.emptySlot().pop();
                     int row = emptySlot[0];
                     int col = emptySlot[1];
@@ -232,7 +233,8 @@ public class SudokuPanel extends JPanel{
                     if (cellColor != null) {
                         g2d.setColor(cellColor);
                     } else {
-                        g2d.setColor(Color.BLACK); // Default color
+                        g2d.setColor(Color.BLACK);
+                        puzzle.setCellColor(row, col, Color.BLACK); // Default color
                     }
                     // Calculate x and y positions for drawing the string
                     int textWidth = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getWidth();
@@ -242,11 +244,11 @@ public class SudokuPanel extends JPanel{
 			}
 		}
                 
-                //Use to set color while clicking in box
+        //Use to set color while clicking in box
 		if(currentlySelectedCol != -1 && currentlySelectedRow != -1) {
 			g2d.setColor(new Color(0.0f,0.0f,1.0f,0.3f));
 			g2d.fillRect(currentlySelectedCol * slotWidth,currentlySelectedRow * slotHeight,slotWidth,slotHeight);
-                        frame.cells[currentlySelectedRow][currentlySelectedCol].requestFocus();
+            frame.getCells()[currentlySelectedRow][currentlySelectedCol].requestFocus();
 		}
 	}
         
@@ -273,6 +275,7 @@ public class SudokuPanel extends JPanel{
                 frame.updateMistakeLabel(mistake);
                 updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.RED);
                 puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = buttonValue;
+                moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
                 gameOver(mistake);
             }
             else{

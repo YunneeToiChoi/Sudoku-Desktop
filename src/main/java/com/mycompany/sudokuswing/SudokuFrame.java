@@ -33,10 +33,9 @@ public final class SudokuFrame extends JFrame {
     private final JButton undoButton ;
     private final JButton delete;
     private final JPanel notePanel;
-    private final JButton btnTakeNote;
     private final JButton btnHint;
     private final JLabel lbHint;
-    public JTextField[][] cells;
+    private JTextField[][] cells;
    
 
     public SudokuFrame() {
@@ -135,8 +134,6 @@ public final class SudokuFrame extends JFrame {
         JLabel noteTitle = new JLabel("Press ENTER to take notes !");
         noteTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         
-        btnTakeNote = new JButton("Take Note");
-        createTakeNoteAction();
 
         delete = new JButton("Delete");
         createDeleteAction();
@@ -154,7 +151,6 @@ public final class SudokuFrame extends JFrame {
         bottomPanel.add(mistakeJLabel);
         bottomPanel.add(delete);
         bottomPanel.add(undoButton);
-        bottomPanel.add(btnTakeNote);
         bottomPanel.add(btnHint);
         bottomPanel.add(lbHint);
         //Add this to frame
@@ -193,20 +189,9 @@ public final class SudokuFrame extends JFrame {
         });
     }
 
-    public void createTakeNoteAction(){
-        btnTakeNote.addActionListener((ActionEvent e) -> {
-            if (sPanel.getCurrentlySelectedRow() == -1 && sPanel.getCurrentlySelectedCol() == -1) {
-                JOptionPane.showMessageDialog(sPanel, "Mời chọn ô để ghi chú");
-            }else{
-                JOptionPane.showMessageDialog(sPanel, "Nhấn Enter để ghi chú ô");
-                cells[sPanel.getCurrentlySelectedRow()][sPanel.getCurrentlySelectedCol()].requestFocus();
-            }
-        });
-    }
-
     public void createHintAction(){
         btnHint.addActionListener((ActionEvent e) -> {
-            if (sPanel.hint < 5) {
+            if (sPanel.getHint() < 5) {
                 sPanel.autoFill();
             }else{
                 JOptionPane.showMessageDialog(sPanel, "Đã hết số lần gợi ý");
@@ -217,7 +202,7 @@ public final class SudokuFrame extends JFrame {
     public void updateHint(int hint){
         lbHint.setText("Hint: " + hint + "/5");
     }
-
+    
 //    //Like above
    public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
         SudokuPuzzle generatedPuzzle = new SudokuGenerator().generateRandomSudoku(puzzleType, group.getSelection().getActionCommand());
@@ -259,8 +244,10 @@ public final class SudokuFrame extends JFrame {
                     JTextField source = (JTextField) e.getSource();
                     String oldNote = source.getText();
                     String note = JOptionPane.showInputDialog(sPanel, "Ghi chú: " + oldNote, "Ghi chú ô Sudoku", JOptionPane.PLAIN_MESSAGE);
-                    if (note != null) {
-                        source.setText(oldNote + note);  
+                    if (oldNote.equals("")) {
+                        source.setText(note);
+                    }else{
+                        source.setText(oldNote + ", " + note);
                     }
                 });
             }
@@ -274,6 +261,10 @@ public final class SudokuFrame extends JFrame {
         notePanel.revalidate();
         notePanel.repaint();
         
+    }
+
+    public JTextField[][] getCells() {
+        return cells;
     }
 
 
