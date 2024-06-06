@@ -43,6 +43,7 @@ public final class SudokuFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Sudoku");
         this.setMinimumSize(new Dimension(1000, 600));
+        this.setLocationRelativeTo(null);
         //Create menuBar
         JMenuBar menuBar = new JMenuBar();
 
