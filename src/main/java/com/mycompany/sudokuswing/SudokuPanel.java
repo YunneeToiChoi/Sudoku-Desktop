@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
+import java.util.Random;
 import java.util.Stack;
 
 import javax.swing.JButton;
@@ -158,25 +159,39 @@ public class SudokuPanel extends JPanel{
         }
         
         public void autoFill(){
+            // Retrieve empty slots and convert to a stack for random access
+            Stack<int[]> emptySlots = puzzle.emptySlot();
+
+            // Reset currently selected row and column if they are set
+            if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+                currentlySelectedRow = -1;
+                currentlySelectedCol = -1;
+            }
+
+            Random rand = new Random();
             
-            for (int i = 1; i < 10; i++) {
+            for (int i = 1; i <= 9; i++) {
                 String value = String.valueOf(i);
-                if (!puzzle.emptySlot().isEmpty()) {
-                    if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
-                        currentlySelectedRow = -1;
-                        currentlySelectedCol = -1;
-                    }
-                    int[] emptySlot = puzzle.emptySlot().pop();
+
+                if (!emptySlots.isEmpty()) {
+                    // Select a random index from the list of empty slots
+                    int randomIndex = rand.nextInt(emptySlots.size());
+                    int[] emptySlot = emptySlots.remove(randomIndex); // Remove the slot to prevent reuse
+
                     int row = emptySlot[0];
-                        int col = emptySlot[1];
+                    int col = emptySlot[1];
+
+                    // Try to place the value in the empty slot if it's a valid move
                     if (puzzle.isValidMove(row, col, value) && hint < 5) {
-                            puzzle.board[row][col] = value;
-                            puzzle.setCellColor(row, col, new Color(194,197,29));
-                            repaint();
-                            hint++;
-                            frame.updateHint(hint);
-                            break;
+                        puzzle.board[row][col] = value;
+                        puzzle.setCellColor(row, col, new Color(194, 197, 29));
+                        repaint();
+                        hint++;
+                        frame.updateHint(hint);
+                        return; // Exit the method after filling one slot
                     }
+                } else {
+                    return; // No empty slots left to fill
                 }
             }
         }
