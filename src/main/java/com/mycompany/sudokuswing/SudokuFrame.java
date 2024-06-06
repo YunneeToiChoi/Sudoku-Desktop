@@ -209,6 +209,8 @@ public final class SudokuFrame extends JFrame {
         sPanel.newSudokuPuzzle(generatedPuzzle);
         sPanel.setFontSize(fontSize);
         sPanel.resetMistakes();
+        sPanel.resetHint();
+        updateHint(sPanel.getHint());
         buttonSelectionPanel.removeAll();
         for (String value : generatedPuzzle.getValidValues()) {
             JButton b = new JButton(value);

@@ -73,7 +73,9 @@ public class SudokuPanel extends JPanel{
         public void setFrame(SudokuFrame frame) {
                 this.frame = frame;
         }
-
+        public void resetHint(){
+            this.hint = 0;
+        }
         public int getCurrentlySelectedCol() {
             return currentlySelectedCol;
         }
@@ -166,7 +168,7 @@ public class SudokuPanel extends JPanel{
                     }
                     int[] emptySlot = puzzle.emptySlot().pop();
                     int row = emptySlot[0];
-                    int col = emptySlot[1];
+                        int col = emptySlot[1];
                     if (puzzle.isValidMove(row, col, value) && hint < 5) {
                             puzzle.board[row][col] = value;
                             puzzle.setCellColor(row, col, new Color(194,197,29));
