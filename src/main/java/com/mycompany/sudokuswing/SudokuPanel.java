@@ -288,6 +288,18 @@ public class SudokuPanel extends JPanel{
         
         
         public void messageFromNumActionListener(String buttonValue) {
+            // Check if the currently selected row and column are set
+            if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a cell before making a move.",
+                    "No Cell Selected",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return; // Exit the method as no cell is selected
+            }
+
+            //Check user make right choice or not
             if (!puzzle.getSolutionValue(currentlySelectedRow, currentlySelectedCol).equals(buttonValue)) {
                 mistake++;
                 frame.updateMistakeLabel(mistake);
