@@ -14,7 +14,7 @@ public class SudokuPuzzle {
 	private final int BOXWIDTH;
 	private final int BOXHEIGHT;
 	private final String [] VALIDVALUES;
-    private String[][] solution;
+        private String[][] solution;
 	
         //Contructor
 	public SudokuPuzzle(int rows,int columns,int boxWidth,int boxHeight,String [] validValues) {
@@ -172,12 +172,12 @@ public class SudokuPuzzle {
 		}
 		return "";
 	}
-	   public String getSolutionValue(int row, int col) {
-        if (this.inRange(row, col)) {
-            return this.solution[row][col];
+	public String getSolutionValue(int row, int col) {
+            if (this.inRange(row, col)) {
+                return this.solution[row][col];
+            }
+            return "";
         }
-        return "";
-    }
 	public String [][] getBoard() {
 		return this.board;
 	}
@@ -207,7 +207,7 @@ public class SudokuPuzzle {
 	}
         
         public void setSolution(String[][] solution) {
-        this.solution = solution;
+            this.solution = solution;
         }
 
         public String[][] getSolution() {
