@@ -86,7 +86,7 @@ public final class SudokuFrame extends JFrame {
         //Create Panel
         JPanel windowPanel = new JPanel();
         windowPanel.setLayout(new BorderLayout());
-        windowPanel.setPreferredSize(new Dimension(800, 600));
+        windowPanel.setPreferredSize(new Dimension(600, 400));
         
         //Bottom Panel
         JPanel bottomPanel = new JPanel();
@@ -101,9 +101,11 @@ public final class SudokuFrame extends JFrame {
 
         //Create button
         buttonSelectionPanel = new JPanel();
-        buttonSelectionPanel.setPreferredSize(new Dimension(200, 200));
+        buttonSelectionPanel.setPreferredSize(new Dimension(200, 100));
         
-        
+        JPanel panelBtn = new JPanel();
+        BoxLayout box4 = new BoxLayout(panelBtn, BoxLayout.Y_AXIS);
+        panelBtn.setLayout(box4);
         //Create SudokuPanel
         sPanel = new SudokuPanel();
         sPanel.setFrame(frame);
@@ -149,13 +151,19 @@ public final class SudokuFrame extends JFrame {
         //
 
         
-        bottomPanel.add(delete);
         bottomPanel.add(undoButton);
         bottomPanel.add(btnHint);
         bottomPanel.add(lbHint);
+        
+        //
+        panelBtn.add(buttonSelectionPanel);
+        panelBtn.add(delete);
+
+
+        
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
-        windowPanel.add(buttonSelectionPanel,BorderLayout.EAST);
+        windowPanel.add(panelBtn,BorderLayout.EAST);
         windowPanel.add(leftPanel, BorderLayout.WEST);
         windowPanel.add(lTimerJLabel,BorderLayout.NORTH);    
         windowPanel.add(bottomPanel,BorderLayout.SOUTH);
@@ -184,6 +192,9 @@ public final class SudokuFrame extends JFrame {
     }
     
     public void createDeleteAction(){
+        delete.setBackground(Color.red);
+        delete.setForeground(Color.white);
+        delete.setPreferredSize(new Dimension(100,40));
         delete.addActionListener((ActionEvent e) -> {
             sPanel.deleteValue();
         });
