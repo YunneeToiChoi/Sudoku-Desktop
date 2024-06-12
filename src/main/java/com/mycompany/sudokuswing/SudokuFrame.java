@@ -93,7 +93,7 @@ public final class SudokuFrame extends JFrame {
         //Bottom Panel
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout());
-        bottomPanel.setPreferredSize(new Dimension(500,50));
+        bottomPanel.setPreferredSize(new Dimension(600,50));
         
         //Right Panel
         JPanel leftPanel = new JPanel();
