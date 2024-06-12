@@ -191,9 +191,7 @@ public class SudokuPanel extends JPanel{
 
             Random rand = new Random();
             
-            for (int i = 1; i <= 9; i++) {
-                String value = String.valueOf(i);
-
+            for (String value : puzzle.getValidValues()) {
                 if (!emptySlots.isEmpty()) {
                     // Select a random index from the list of empty slots
                     int randomIndex = rand.nextInt(emptySlots.size());
@@ -287,7 +285,7 @@ public class SudokuPanel extends JPanel{
 		if(currentlySelectedCol != -1 && currentlySelectedRow != -1) {
 			g2d.setColor(new Color(0.0f,0.0f,1.0f,0.3f));
 			g2d.fillRect(currentlySelectedCol * slotWidth,currentlySelectedRow * slotHeight,slotWidth,slotHeight);
-            frame.getCells()[currentlySelectedRow][currentlySelectedCol].requestFocus();
+                        frame.getCells()[currentlySelectedRow][currentlySelectedCol].requestFocus();
 		}
 	}
         
