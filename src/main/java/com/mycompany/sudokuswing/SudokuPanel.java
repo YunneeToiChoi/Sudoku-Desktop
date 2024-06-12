@@ -34,7 +34,8 @@ public class SudokuPanel extends JPanel{
 	private int usedHeight;
 	private int fontSize;
     private int mistake;
-    private Timer timer;
+    private final Timer timer;
+    private boolean timerIsRunning = false;
     private int secondsPassed = 0;
     private final Stack<int[]> moveHistory = new Stack<>();
     private int hint;
@@ -44,6 +45,11 @@ public class SudokuPanel extends JPanel{
 		this.setPreferredSize(new Dimension(540,450));
 		this.addMouseListener(new SudokuPanelMouseAdapter());
 		this.puzzle = new SudokuGenerator().generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Easy");
+        // Initialize the timer
+        this.timer = new Timer(1000, (ActionEvent e) -> {
+            secondsPassed++;
+            updateTimerDisplay();
+        });
 		currentlySelectedCol = -1;
 		currentlySelectedRow = -1;
 		usedWidth = 0;
@@ -55,6 +61,11 @@ public class SudokuPanel extends JPanel{
 		this.setPreferredSize(new Dimension(540,450));
 		this.addMouseListener(new SudokuPanelMouseAdapter());
 		this.puzzle = puzzle;
+        // Initialize the timer
+        this.timer = new Timer(1000, (ActionEvent e) -> {
+            secondsPassed++;
+            updateTimerDisplay();
+        });
 		currentlySelectedCol = -1;
 		currentlySelectedRow = -1;
 		usedWidth = 0;
@@ -88,7 +99,14 @@ public class SudokuPanel extends JPanel{
         public int getHint() {
             return hint;
         }
-        
+
+        public Timer getTimer(){
+            return timer;
+        }
+
+        public boolean getTimerState(){
+            return timerIsRunning;
+        }
         public void resetMistakes() {
             this.mistake = 0;
             if (frame != null) {
@@ -96,29 +114,32 @@ public class SudokuPanel extends JPanel{
             }
         }
         
-        public void resetTimer() {
-            stopTimer();  
-            secondsPassed = 0; 
-            updateTimerDisplay();  
-        }
-
-
         public void startTimer() {
-            resetTimer();  
-            timer = new Timer(1000, e -> {
-                secondsPassed++;
-                updateTimerDisplay();
-            });
-            timer.start();
-        }
-
-
-        public void stopTimer() {
-            if (timer != null) {
-                timer.stop();
+            if (!timerIsRunning) {
+                timer.start();
+                timerIsRunning = true;
             }
         }
 
+        public void pauseTimer() {
+            if (timerIsRunning) {
+                timer.stop();
+                timerIsRunning = false;
+            }
+        }
+
+        public void resumeTimer() {
+            if (!timerIsRunning) {
+                startTimer();
+            }
+        }
+
+        public void resetTimer() {
+            pauseTimer();
+            timerIsRunning = false;
+            secondsPassed = 0;
+            updateTimerDisplay();
+        }
         private void updateTimerDisplay() {
             int minutes = secondsPassed / 60;
             int seconds = secondsPassed % 60;
@@ -338,9 +359,11 @@ public class SudokuPanel extends JPanel{
         newSudokuPuzzle(newPuzzle);
         currentlySelectedCol = -1;
         currentlySelectedRow = -1;
-        startTimer();
+        resetTimer();
         resetMoveHistory();
+        startTimer();
         repaint();
+        
     }
         
 	

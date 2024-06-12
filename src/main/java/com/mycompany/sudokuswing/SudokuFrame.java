@@ -13,6 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -32,6 +33,7 @@ public final class SudokuFrame extends JFrame {
     private final JLabel mistakeJLabel;
     private final JButton undoButton ;
     private final JButton delete;
+    private final JButton pauseButton;
     private final JPanel notePanel;
     private final JButton btnHint;
     private final JLabel lbHint;
@@ -142,6 +144,9 @@ public final class SudokuFrame extends JFrame {
         
         btnHint = new JButton("Hint");
         createHintAction();
+
+        pauseButton = new JButton("Pause");
+        createPauseAction();
         
         
         nullPanel.add(notePanel);
@@ -152,6 +157,7 @@ public final class SudokuFrame extends JFrame {
         bottomPanel.add(delete);
         bottomPanel.add(undoButton);
         bottomPanel.add(btnHint);
+        bottomPanel.add(pauseButton);
         bottomPanel.add(lbHint);
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
@@ -172,9 +178,42 @@ public final class SudokuFrame extends JFrame {
             sPanel.undoMove();
         });
     }
+    private void createPauseAction() {
+        pauseButton.addActionListener((ActionEvent e) -> {
+            if (sPanel.getTimerState()) {
+                sPanel.pauseTimer();
 
-    
-    
+                // Create a JOptionPane with a custom OK button
+                JOptionPane optionPane = new JOptionPane(
+                    "Game is pausing",
+                    JOptionPane.WARNING_MESSAGE,
+                    JOptionPane.DEFAULT_OPTION,
+                    null,
+                    new Object[] {"OK"},  // Custom options with only an OK button
+                    "OK"  // Default button
+                );
+
+                // Create a JDialog from the JOptionPane
+                JDialog dialog = optionPane.createDialog(this, "Pause");
+                dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+                // Add an action listener to the OK button
+                optionPane.addPropertyChangeListener(evt -> {
+                    String prop = evt.getPropertyName();
+
+                    if (dialog.isActive()
+                            && (evt.getSource() == optionPane)
+                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+                        // Resume the timer when OK is clicked
+                        sPanel.resumeTimer();
+                        dialog.dispose();
+                    }
+                });
+
+                dialog.setVisible(true);
+            }
+        });
+    }
     public void updateMistakeLabel(int mistakes) {
            mistakeJLabel.setText("Mistakes: " + mistakes + "/3");
     }
@@ -210,6 +249,7 @@ public final class SudokuFrame extends JFrame {
         sPanel.setFontSize(fontSize);
         sPanel.resetMistakes();
         sPanel.resetHint();
+        sPanel.resetTimer();
         updateHint(sPanel.getHint());
         buttonSelectionPanel.removeAll();
         for (String value : generatedPuzzle.getValidValues()) {
