@@ -88,26 +88,24 @@ public final class SudokuFrame extends JFrame {
         //Create Panel
         JPanel windowPanel = new JPanel();
         windowPanel.setLayout(new BorderLayout());
-        windowPanel.setPreferredSize(new Dimension(600, 400));
+        windowPanel.setPreferredSize(new Dimension(1000, 600));
         
         //Bottom Panel
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout());
-        bottomPanel.setPreferredSize(new Dimension(600,50));
+        bottomPanel.setPreferredSize(new Dimension(500,50));
         
         //Right Panel
-        JPanel leftPanel = new JPanel();
-        BoxLayout box = new BoxLayout(leftPanel, BoxLayout.Y_AXIS);
-        leftPanel.setLayout(box);
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout());
+        JPanel nullPanel = new JPanel();
+        nullPanel.setLayout(new FlowLayout());
         
 
         //Create button
         buttonSelectionPanel = new JPanel();
-        buttonSelectionPanel.setPreferredSize(new Dimension(200, 100));
+        buttonSelectionPanel.setPreferredSize(new Dimension(200, 200));
         
-        JPanel panelBtn = new JPanel();
-        BoxLayout box4 = new BoxLayout(panelBtn, BoxLayout.Y_AXIS);
-        panelBtn.setLayout(box4);
         //Create SudokuPanel
         sPanel = new SudokuPanel();
         sPanel.setFrame(frame);
@@ -120,7 +118,6 @@ public final class SudokuFrame extends JFrame {
         
         //Create mistake
         mistakeJLabel = new JLabel("Mistakes: 0/3");
-        mistakeJLabel.setFont(new Font("Roboto",Font.PLAIN,26));
 
         //Create undo
         undoButton = new JButton("Undo");
@@ -137,7 +134,8 @@ public final class SudokuFrame extends JFrame {
         notePanel.setPreferredSize(new Dimension(200,200));
         
         JLabel noteTitle = new JLabel("Press ENTER to take notes !");
-        
+        noteTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
 
         delete = new JButton("Delete");
         createDeleteAction();
@@ -149,28 +147,26 @@ public final class SudokuFrame extends JFrame {
 
         pauseButton = new JButton("Pause");
         createPauseAction();
-        
-        leftPanel.add(noteTitle);
-        leftPanel.add(notePanel);
-        leftPanel.add(mistakeJLabel);
-        //
 
-        
+
+        nullPanel.add(notePanel);
+        rightPanel.add(nullPanel,BorderLayout.CENTER);
+        rightPanel.add(noteTitle,BorderLayout.NORTH);
+        //
+        bottomPanel.add(mistakeJLabel);
+        bottomPanel.add(delete);
         bottomPanel.add(undoButton);
         bottomPanel.add(btnHint);
-        bottomPanel.add(pauseButton);
         bottomPanel.add(lbHint);
-        
         //
-        panelBtn.add(buttonSelectionPanel);
-        panelBtn.add(delete);
+        
 
 
         
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
-        windowPanel.add(panelBtn,BorderLayout.EAST);
-        windowPanel.add(leftPanel, BorderLayout.WEST);
+        windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
+        windowPanel.add(rightPanel, BorderLayout.EAST);
         windowPanel.add(lTimerJLabel,BorderLayout.NORTH);    
         windowPanel.add(bottomPanel,BorderLayout.SOUTH);
         
@@ -231,9 +227,6 @@ public final class SudokuFrame extends JFrame {
     }
     
     public void createDeleteAction(){
-        delete.setBackground(Color.red);
-        delete.setForeground(Color.white);
-        delete.setPreferredSize(new Dimension(100,40));
         delete.addActionListener((ActionEvent e) -> {
             sPanel.deleteValue();
         });
