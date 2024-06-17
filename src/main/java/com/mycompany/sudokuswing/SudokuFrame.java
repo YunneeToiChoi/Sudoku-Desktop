@@ -39,9 +39,15 @@ public final class SudokuFrame extends JFrame {
     private final JButton btnHint;
     private final JLabel lbHint;
     private JTextField[][] cells;
+    private final Integer user_id;
    
-
-    public SudokuFrame() {
+    
+    private SudokuFrame() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    public SudokuFrame(Integer ID) {
+        this.user_id = ID;
         SudokuFrame frame = this;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Sudoku");
@@ -107,7 +113,7 @@ public final class SudokuFrame extends JFrame {
         buttonSelectionPanel.setPreferredSize(new Dimension(200, 200));
         
         //Create SudokuPanel
-        sPanel = new SudokuPanel();
+        sPanel = new SudokuPanel(user_id);
         sPanel.setFrame(frame);
 
         // Create counting time
@@ -176,7 +182,7 @@ public final class SudokuFrame extends JFrame {
 
     }
 
-    
+  
     private void createUndoAction() {
         undoButton.addActionListener((ActionEvent e) -> {
             sPanel.undoMove();

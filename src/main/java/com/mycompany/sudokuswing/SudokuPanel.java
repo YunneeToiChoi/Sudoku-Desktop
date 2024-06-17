@@ -20,6 +20,10 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 
+import Database.DatabaseConnector;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 
 public class SudokuPanel extends JPanel{
@@ -33,15 +37,17 @@ public class SudokuPanel extends JPanel{
 	private int usedWidth;
 	private int usedHeight;
 	private int fontSize;
-    private int mistake;
-    private final Timer timer;
-    private boolean timerIsRunning = false;
-    private int secondsPassed = 0;
-    private final Stack<int[]> moveHistory = new Stack<>();
-    private int hint;
+        private int mistake;
+        private final Timer timer;
+        private boolean timerIsRunning = false;
+        private int secondsPassed = 0;
+        private final Stack<int[]> moveHistory = new Stack<>();
+        private int hint;
+        private int user_id;
 
 	//Contructor
-	public SudokuPanel() {
+	public SudokuPanel(Integer ID) {
+                this.user_id = ID;
 		this.setPreferredSize(new Dimension(540,450));
 		this.addMouseListener(new SudokuPanelMouseAdapter());
 		this.puzzle = new SudokuGenerator().generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Easy");
@@ -332,6 +338,7 @@ public class SudokuPanel extends JPanel{
                 moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
                 updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.BLUE);
                 if (puzzle.boardFull()) {
+                    updateUserScore(user_id);
                     int option = JOptionPane.showOptionDialog(
                     this,
                     "Bạn đã chiến thắng! Bạn có muốn chơi lại không?",
@@ -364,7 +371,32 @@ public class SudokuPanel extends JPanel{
         
     }
         
-	
+        private void updateUserScore(int userId) {
+        String sql = "IF EXISTS (SELECT 1 FROM UserScores WHERE user_id = ?) " +
+                     "BEGIN " +
+                     "    UPDATE UserScores SET score = score + 100 WHERE user_id = ?; " +
+                     "END " +
+                     "ELSE " +
+                     "BEGIN " +
+                     "    INSERT INTO UserScores (user_id, score) VALUES (?, 100); " +
+                     "END";
+
+        try (Connection con = DatabaseConnector.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            stmt.setInt(2, userId);
+            stmt.setInt(3, userId);
+            stmt.executeUpdate();
+            System.out.println("Score updated successfully.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to update score.");
+        }
+    } 
+                
+                
 	public class NumActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
