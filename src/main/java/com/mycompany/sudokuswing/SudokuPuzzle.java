@@ -7,7 +7,7 @@ public class SudokuPuzzle {
     
     //Attribute
     protected String [][] board;
-	protected boolean [][] mutable;
+    protected boolean [][] mutable;
     protected Color[][] cellColors;
 	private final int ROWS;
 	private final int COLUMNS;
@@ -53,7 +53,20 @@ public class SudokuPuzzle {
 		}
 	}
         
+        //Setter
+        public void setBoard(String[][] board) {
+            this.board = board;
+        }
+
+        public void setMutable(boolean[][] mutable) {
+            this.mutable = mutable;
+        }
+        
 	//Getter
+        public boolean[][] getMutable() {
+            return mutable;
+        }
+            
 	public int getNumRows() {
 		return this.ROWS;
 	}

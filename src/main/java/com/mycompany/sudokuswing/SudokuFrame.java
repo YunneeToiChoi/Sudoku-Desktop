@@ -1,5 +1,6 @@
 package com.mycompany.sudokuswing;
 
+import Database.GameState;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,6 +9,14 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -52,7 +61,7 @@ public final class SudokuFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Sudoku");
         this.setMinimumSize(new Dimension(1000, 600));
-        this.setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);   
         //Create menuBar
         JMenuBar menuBar = new JMenuBar();
 
@@ -178,7 +187,51 @@ public final class SudokuFrame extends JFrame {
         
         this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
+
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
+
+        GameState savedGame = loadGame();
+        if (savedGame != null) {
+            System.out.println("Loaded GameState: " + savedGame);
+            int confirm = JOptionPane.showOptionDialog(
+                    frame,
+                    "Do you want to continue your previous game?",
+                    "Load Game",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    null,
+                    null);
+            if (confirm == JOptionPane.YES_OPTION) {
+                SudokuPuzzleType puzzleType = determinePuzzleType(savedGame.getBoard());
+                int fontSize = (puzzleType == SudokuPuzzleType.SIXBYSIX) ? 30 : (puzzleType == SudokuPuzzleType.NINEBYNINE) ? 26 : 20;
+                rebuildInterface(puzzleType, fontSize, group);
+                sPanel.restoreGameState(savedGame);
+            } else {
+                rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group); // Hoặc kích thước khác nếu không tiếp tục
+            }
+        }
+
+        // Add window listener to handle save game on close
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int confirm = JOptionPane.showOptionDialog(
+                        frame,
+                        "Do you want to save your game before exiting?",
+                        "Exit Confirmation",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        null,
+                        null);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    GameState gameState = new GameState(sPanel.getBoard(), sPanel.getPuzzle().getMutable(), sPanel.getSecondsPassed(), sPanel.getMistake(), sPanel.getHint());
+                    saveGame(gameState);
+                }
+                System.exit(0);
+            }
+        });
 
     }
 
@@ -251,6 +304,52 @@ public final class SudokuFrame extends JFrame {
     public void updateHint(int hint){
         lbHint.setText("Hint: " + hint + "/5");
     }
+    
+    
+    private SudokuPuzzleType determinePuzzleType(String[][] board) {
+        int rows = board.length;
+        int cols = board[0].length;
+
+        if (rows == 6 && cols == 6) {
+            return SudokuPuzzleType.SIXBYSIX;
+        } else if (rows == 9 && cols == 9) {
+            return SudokuPuzzleType.NINEBYNINE;
+        } else if (rows == 12 && cols == 12) {
+            return SudokuPuzzleType.TWELVEBYTWELVE;
+        } else {
+            throw new IllegalArgumentException("Unsupported puzzle size");
+        }
+    }
+    
+    public void saveGame(GameState gameState) {
+        try {
+            File directory = new File("Appdata");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            FileOutputStream fileOut = new FileOutputStream("Appdata/gameState.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(gameState);
+            out.close();
+            fileOut.close();
+            System.out.println("Game state saved in Appdata/gameState.ser");
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
+    }
+     public GameState loadGame() {
+        GameState gameState = null;
+        try (FileInputStream fileIn = new FileInputStream("Appdata/gameState.ser");
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            gameState = (GameState) in.readObject();
+        } catch (IOException i) {
+            i.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            c.printStackTrace();
+        }
+        return gameState;
+    }
+    
     
 //    //Like above
    public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
