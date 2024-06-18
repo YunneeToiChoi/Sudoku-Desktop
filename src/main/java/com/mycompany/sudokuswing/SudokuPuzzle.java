@@ -8,14 +8,14 @@ public class SudokuPuzzle {
     //Attribute
     protected String [][] board;
 	protected boolean [][] mutable;
-    protected Color[][] cellColors;
+        protected Color[][] cellColors;
 	private final int ROWS;
 	private final int COLUMNS;
 	private final int BOXWIDTH;
 	private final int BOXHEIGHT;
 	private final String [] VALIDVALUES;
         private String[][] solution;
-	
+        
         //Contructor
 	public SudokuPuzzle(int rows,int columns,int boxWidth,int boxHeight,String [] validValues) {
 		this.ROWS = rows;
@@ -50,7 +50,7 @@ public class SudokuPuzzle {
 				this.mutable[r][c] = puzzle.mutable[r][c];
 				this.cellColors[r][c] = puzzle.cellColors[r][c];
 			}
-		}
+		}  
 	}
         
 	//Getter
@@ -85,8 +85,8 @@ public class SudokuPuzzle {
                 return cellColors[row][col];
             }
             return Color.WHITE; // Trả về màu mặc định nếu không hợp lệ
-    }
-                  
+        }
+                
 	//Fill value in box
 	public void makeMove(int row,int col,String value,boolean isMutable) {
 		if(this.isValidValue(value) && this.isValidMove(row,col,value) && this.isSlotMutable(row, col)) {

@@ -13,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.util.Random;
 import java.util.Stack;
-
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,18 +27,18 @@ public class SudokuPanel extends JPanel{
     
     //Attribute
     private SudokuPuzzle puzzle;
-	private int currentlySelectedCol;
-	private int currentlySelectedRow;
-	private int usedWidth;
-	private int usedHeight;
-	private int fontSize;
+    private int currentlySelectedCol;
+    private int currentlySelectedRow;
+    private int usedWidth;
+    private int usedHeight;
+    private int fontSize;
     private int mistake;
     private final Timer timer;
     private boolean timerIsRunning = false;
     private int secondsPassed = 0;
     private final Stack<int[]> moveHistory = new Stack<>();
     private int hint;
-
+  
 	//Contructor
 	public SudokuPanel() {
 		this.setPreferredSize(new Dimension(540,450));
@@ -55,6 +54,7 @@ public class SudokuPanel extends JPanel{
 		usedWidth = 0;
 		usedHeight = 0;
 		fontSize = 26;
+                
 	}
 	
 	public SudokuPanel(SudokuPuzzle puzzle) {
@@ -70,14 +70,15 @@ public class SudokuPanel extends JPanel{
 		currentlySelectedRow = -1;
 		usedWidth = 0;
 		usedHeight = 0;
-		fontSize = 26;
+		fontSize = 26;   
+                
 	}
         
 	//Method
 	public void newSudokuPuzzle(SudokuPuzzle puzzle) {
 		this.puzzle = puzzle;
 	}
-	
+
 	public void setFontSize(int fontSize) {
 		this.fontSize = fontSize;
 	}
@@ -165,17 +166,25 @@ public class SudokuPanel extends JPanel{
         }
         
         public void deleteValue(){
-            if(puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol].equals("")){
+            if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+                if(puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol].equals("")){
                 JOptionPane.showMessageDialog(this, "Cell trống");
+                frame.playSound("sounds/button.wav");
             }else{
                 if(!puzzle.getCellColor(currentlySelectedRow, currentlySelectedCol).equals(Color.BLACK)){
                     puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = "";
                 }
                 else{
                     JOptionPane.showMessageDialog(this, "Cell đề bài");
+                    frame.playSound("sounds/button.wav");
                 }
             }
             repaint();
+            }else{
+                JOptionPane.showMessageDialog(this, "Chưa chọn ô để xóa");
+                frame.playSound("sounds/button.wav");
+            }
+            
             
         }
         
@@ -221,17 +230,17 @@ public class SudokuPanel extends JPanel{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(new Color(1.0f,1.0f,1.0f)); //white
                 
-		//Use to calculate width and height of one box by use panel widht and height / numCols and numRows
+                //Use to calculate width and height of one box by use panel widht and height / numCols and numRows
 		int slotWidth = this.getWidth()/puzzle.getNumColumns();
 		int slotHeight = this.getHeight()/puzzle.getNumRows();
 		
 		usedWidth = (this.getWidth()/puzzle.getNumColumns())*puzzle.getNumColumns();
 		usedHeight = (this.getHeight()/puzzle.getNumRows())*puzzle.getNumRows();
-		
+               
+                    
+                g2d.setColor(new Color(1.0f,1.0f,1.0f)); //white
 		g2d.fillRect(0, 0,usedWidth,usedHeight);
-		
 		g2d.setColor(new Color(0.0f,0.0f,0.0f));
                 
                 //Use to draw vertical line
@@ -257,39 +266,40 @@ public class SudokuPanel extends JPanel{
 				g2d.drawLine(0, y, usedWidth, y);
 			}
 		}
-                
                 //Use to set font, width, height of text in box 
 		Font f = new Font("Times New Roman", Font.PLAIN, fontSize);
-		g2d.setFont(f);
+                g2d.setFont(f);
 		FontRenderContext fContext = g2d.getFontRenderContext();
 		for(int row=0;row < puzzle.getNumRows();row++) {
 			for(int col=0;col < puzzle.getNumColumns();col++) {
-                String cellValue = puzzle.getValue(row, col);
-                if (!cellValue.equals("")) {
-                    Color cellColor = puzzle.getCellColor(row, col);
-                    if (cellColor != null) {
-                        g2d.setColor(cellColor);
-                    } else {
-                        g2d.setColor(Color.BLACK);
-                        puzzle.setCellColor(row, col, Color.BLACK); // Default color
-                    }
-                    // Calculate x and y positions for drawing the string
-                    int textWidth = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getWidth();
-                    int textHeight = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getHeight();
-                    g2d.drawString(puzzle.getValue(row, col), (col * slotWidth) + ((slotWidth / 2) - (textWidth / 2)), (row * slotHeight) + ((slotHeight / 2) + (textHeight / 2)));
-                }
+                            String cellValue = puzzle.getValue(row, col);
+                            if (!cellValue.equals("")) {
+                                
+                                Color cellColor = puzzle.getCellColor(row, col);
+                                if (cellColor != null) {
+                                    g2d.setColor(cellColor);
+                                } else {
+                                    g2d.setColor(Color.BLACK);
+                                    puzzle.setCellColor(row, col, Color.BLACK); // Default color
+                                }
+                            // Calculate x and y positions for drawing the string
+                            int textWidth = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getWidth();
+                            int textHeight = (int) f.getStringBounds(puzzle.getValue(row, col), fContext).getHeight();
+                            g2d.drawString(puzzle.getValue(row, col), (col * slotWidth) + ((slotWidth / 2) - (textWidth / 2)), (row * slotHeight) + ((slotHeight / 2) + (textHeight / 2)));
+                            }        
 			}
 		}
-                
+
         //Use to set color while clicking in box
-		if(currentlySelectedCol != -1 && currentlySelectedRow != -1) {
+		if(currentlySelectedCol != -1 && currentlySelectedRow != -1 ) {
+                        
 			g2d.setColor(new Color(0.0f,0.0f,1.0f,0.3f));
 			g2d.fillRect(currentlySelectedCol * slotWidth,currentlySelectedRow * slotHeight,slotWidth,slotHeight);
                         frame.getCells()[currentlySelectedRow][currentlySelectedCol].requestFocus();
 		}
-	}
+
+             }    
         
-                
         public void gameOver(int mistake){
             if (mistake == 3) {
                 JOptionPane.showMessageDialog(this, "Game Over!", "Error", JOptionPane.OK_OPTION);
@@ -306,20 +316,22 @@ public class SudokuPanel extends JPanel{
         }
         
         
-        public void messageFromNumActionListener(String buttonValue) {
-            // Check if the currently selected row and column are set
-            if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
+        public void messageFromNumActionListener(String buttonValue) {          
+                // Check if the currently selected row and column are set
+            if (currentlySelectedRow == -1 || currentlySelectedCol == -1) { 
                 JOptionPane.showMessageDialog(
                     this,
                     "Please select a cell before making a move.",
                     "No Cell Selected",
                     JOptionPane.WARNING_MESSAGE
                 );
+                frame.playSound("sounds/button.wav");
                 return; // Exit the method as no cell is selected
             }
-
+            
             //Check user make right choice or not
             if (!puzzle.getSolutionValue(currentlySelectedRow, currentlySelectedCol).equals(buttonValue)) {
+                frame.playSound("sounds/wrong.wav");
                 mistake++;
                 frame.updateMistakeLabel(mistake);
                 updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.RED);
@@ -328,6 +340,7 @@ public class SudokuPanel extends JPanel{
                 gameOver(mistake);
             }
             else{
+                frame.playSound("sounds/correct.wav");
                 puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
                 moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
                 updateCellColor(currentlySelectedRow, currentlySelectedCol, Color.BLUE);
@@ -343,12 +356,14 @@ public class SudokuPanel extends JPanel{
                     "Play Again"
                     );       
                     if (option == JOptionPane.YES_OPTION) {
+                        frame.playSound("sounds/button.wav");
                         playAgain();
                     } else {
                         System.exit(0);
                     }
                 }
             }
+            
             repaint();
         }
         
