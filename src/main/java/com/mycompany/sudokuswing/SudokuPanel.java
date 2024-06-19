@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.util.Random;
 import java.util.Stack;
+
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,6 +39,7 @@ public class SudokuPanel extends JPanel{
     private int secondsPassed = 0;
     private final Stack<int[]> moveHistory = new Stack<>();
     private int hint;
+    private int score = 0;
   
 	//Contructor
 	public SudokuPanel() {
@@ -331,6 +333,10 @@ public class SudokuPanel extends JPanel{
             
             //Check user make right choice or not
             if (!puzzle.getSolutionValue(currentlySelectedRow, currentlySelectedCol).equals(buttonValue)) {
+                if(score != 0){
+                    score -= 200;
+                    frame.updateScore(score);
+                }
                 frame.playSound("sounds/wrong.wav");
                 mistake++;
                 frame.updateMistakeLabel(mistake);
@@ -340,6 +346,13 @@ public class SudokuPanel extends JPanel{
                 gameOver(mistake);
             }
             else{
+                if(secondsPassed/60000 <= 5) {
+                    frame.updateScore(score+=1000);
+                }else if (secondsPassed/60000 <= 10){
+                    frame.updateScore(score+=500);
+                }else{
+                    frame.updateScore(score+=200);
+                }
                 frame.playSound("sounds/correct.wav");
                 puzzle.makeMove(currentlySelectedRow, currentlySelectedCol, buttonValue, true);
                 moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});

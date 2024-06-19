@@ -9,13 +9,11 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -34,6 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
 public final class SudokuFrame extends JFrame {
     private final JPanel buttonSelectionPanel;
@@ -48,7 +47,8 @@ public final class SudokuFrame extends JFrame {
     private final JLabel lbHint;
     private JTextField[][] cells;
     private Clip clip;
-    private JToggleButton btnAudio;
+    private final JToggleButton btnAudio;
+    private final JLabel scoreLabel;
 
 
     public SudokuFrame() {
@@ -120,7 +120,10 @@ public final class SudokuFrame extends JFrame {
         leftPanel.setPreferredSize(new Dimension(200, 200));
         JPanel nullPanel2 = new JPanel();
         nullPanel2.setLayout(new FlowLayout());
-        
+        //Top Panel
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BorderLayout());
+        topPanel.setPreferredSize(new Dimension(100,50));
         //Create button
         buttonSelectionPanel = new JPanel();
         buttonSelectionPanel.setPreferredSize(new Dimension(200, 200));
@@ -131,10 +134,14 @@ public final class SudokuFrame extends JFrame {
 
         // Create counting time
         lTimerJLabel = new JLabel("00:00");
-        lTimerJLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Font font = new Font("Time New Roman", Font.PLAIN, 30);
-        lTimerJLabel.setFont(font);
         
+        Font fontTimeLabel = new Font("Time New Roman", Font.PLAIN, 30);
+        lTimerJLabel.setFont(fontTimeLabel);
+        //Create score
+        scoreLabel = new JLabel("Score: 0");
+        Font fontScoreLabel = new Font("Time New Roman", Font.PLAIN, 21);
+        scoreLabel.setFont(fontScoreLabel);
+
         //Create mistake
         mistakeJLabel = new JLabel("Mistakes: 0/3");
 
@@ -194,14 +201,16 @@ public final class SudokuFrame extends JFrame {
         nullPanel2.add(buttonSelectionPanel);
         leftPanel.add(nullPanel2,BorderLayout.CENTER);
         leftPanel.add(btnAudio,BorderLayout.NORTH);
-
-
-        
+        //
+        topPanel.add(scoreLabel, BorderLayout.WEST);
+        topPanel.add(lTimerJLabel, BorderLayout.EAST);
+        topPanel.setBorder(new EmptyBorder(0,200,0,220));
+        //
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
         windowPanel.add(leftPanel,BorderLayout.WEST);
-        windowPanel.add(rightPanel, BorderLayout.EAST);
-        windowPanel.add(lTimerJLabel,BorderLayout.NORTH);    
+        windowPanel.add(rightPanel, BorderLayout.EAST);   
+        windowPanel.add(topPanel,BorderLayout.NORTH);
         windowPanel.add(bottomPanel,BorderLayout.SOUTH);
         
         this.add(windowPanel);
@@ -286,7 +295,9 @@ public final class SudokuFrame extends JFrame {
     public void updateHint(int hint){
         lbHint.setText("Hint: " + hint + "/5");
     }
-    
+    public void updateScore(int score){
+        scoreLabel.setText("Score: " + score);
+    }
     public void createAudioAction(){
         btnAudio.addActionListener((ActionEvent e) -> {
             if (btnAudio.isSelected()==true) {
