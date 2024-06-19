@@ -346,9 +346,9 @@ public class SudokuPanel extends JPanel{
                 gameOver(mistake);
             }
             else{
-                if(secondsPassed/60000 <= 5) {
+                if(secondsPassed/60 <= 5) {
                     frame.updateScore(score+=1000);
-                }else if (secondsPassed/60000 <= 10){
+                }else if (secondsPassed/60 <= 10){
                     frame.updateScore(score+=500);
                 }else{
                     frame.updateScore(score+=200);
