@@ -30,10 +30,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public final class SudokuFrame extends JFrame {
     private final JPanel buttonSelectionPanel;
@@ -48,7 +51,8 @@ public final class SudokuFrame extends JFrame {
     private final JLabel lbHint;
     private JTextField[][] cells;
     private Clip clip;
-    private JToggleButton btnAudio;
+    private Sound sound = new Sound();
+    private JSlider slider;
 
 
     public SudokuFrame() {
@@ -80,6 +84,65 @@ public final class SudokuFrame extends JFrame {
         medium.setActionCommand("Medium");
         JRadioButton hard = new JRadioButton("Hard");
         hard.setActionCommand("Hard");
+        
+        //audio setting
+        JMenuItem audioSetting = new JMenuItem("Setting");
+        audioSetting.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame setting = new JFrame();
+                setting.setLayout(new FlowLayout());
+                setting.setLocationRelativeTo(null);
+               
+                
+                slider = new JSlider(-40, 6);
+                
+                slider.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        sound.currentVolume = slider.getValue();
+                        if (sound.currentVolume == -40) {
+                            sound.currentVolume = -80;
+                        }
+                        sound.fc.setValue(sound.currentVolume);
+                    }
+                });
+                ImageIcon audioIcon = new ImageIcon("sounds/volume.png");
+                Image img = audioIcon.getImage();
+                Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(newImage);
+                JButton volumeMute = new JButton(scaledIcon);
+                volumeMute.setOpaque(false);
+                volumeMute.setBorderPainted(false);
+                volumeMute.addActionListener(new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        sound.volumeMute(slider);
+                        if (sound.isMute()==false) {
+                            ImageIcon audioIcon = new ImageIcon("sounds/volume.png");
+                            Image img = audioIcon.getImage();
+                            Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+                            ImageIcon scaledIcon = new ImageIcon(newImage);
+                            volumeMute.setIcon(scaledIcon);
+                        }else{
+                            ImageIcon audioIcon = new ImageIcon("sounds/mute.png");
+                            Image img = audioIcon.getImage();
+                            Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+                            ImageIcon scaledIcon = new ImageIcon(newImage);
+                            volumeMute.setIcon(scaledIcon);
+                        }
+                    }
+                }); 
+                
+                setting.add(volumeMute);
+                setting.add(slider);
+                setting.pack();
+                setting.setVisible(true);
+            }
+            
+        });
+        audio.add(audioSetting);
         
         //Add this to menu
         newGame.add(sixBySixGame);
@@ -113,13 +176,6 @@ public final class SudokuFrame extends JFrame {
         JPanel nullPanel = new JPanel();
         nullPanel.setLayout(new FlowLayout());
         
-
-        //Left Panel
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BorderLayout());
-        leftPanel.setPreferredSize(new Dimension(200, 200));
-        JPanel nullPanel2 = new JPanel();
-        nullPanel2.setLayout(new FlowLayout());
         
         //Create button
         buttonSelectionPanel = new JPanel();
@@ -141,11 +197,6 @@ public final class SudokuFrame extends JFrame {
         //Create undo
         undoButton = new JButton("Undo");
         createUndoAction();
-//        undoButton.addActionListener(new ActionListener() {
-//          public void actionPerformed(ActionEvent e) {
-//              sPanel.undoMove();
-//          }
-//      });
         
         
         //
@@ -167,17 +218,6 @@ public final class SudokuFrame extends JFrame {
         pauseButton = new JButton("Pause");
         createPauseAction();
         
-        ImageIcon audioIcon = new ImageIcon("sounds/volume.png");
-        Image img = audioIcon.getImage();
-        Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(newImage);
-        
-        btnAudio = new JToggleButton();
-        btnAudio.setOpaque(false);
-        btnAudio.setContentAreaFilled(false);
-        btnAudio.setIcon(scaledIcon);
-        btnAudio.setBorderPainted(false);
-        createAudioAction();
         
         //
         nullPanel.add(notePanel);
@@ -190,16 +230,10 @@ public final class SudokuFrame extends JFrame {
         bottomPanel.add(btnHint);
         bottomPanel.add(pauseButton);
         bottomPanel.add(lbHint);
-        //
-        nullPanel2.add(buttonSelectionPanel);
-        leftPanel.add(nullPanel2,BorderLayout.CENTER);
-        leftPanel.add(btnAudio,BorderLayout.NORTH);
-
-
-        
+ 
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
-        windowPanel.add(leftPanel,BorderLayout.WEST);
+        windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
         windowPanel.add(rightPanel, BorderLayout.EAST);
         windowPanel.add(lTimerJLabel,BorderLayout.NORTH);    
         windowPanel.add(bottomPanel,BorderLayout.SOUTH);
@@ -207,7 +241,7 @@ public final class SudokuFrame extends JFrame {
         this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
-        playSound("sounds/gamemusic.wav");
+        playMusic("sounds/gamemusic.wav");
     }
 
     
@@ -219,7 +253,7 @@ public final class SudokuFrame extends JFrame {
     }
     private void createPauseAction() {
         pauseButton.addActionListener((ActionEvent e) -> {
-            stopSound();
+            sound.stop();
             playSound("sounds/pausing.wav");
             if (sPanel.getTimerState()) {
                 sPanel.pauseTimer();
@@ -249,7 +283,7 @@ public final class SudokuFrame extends JFrame {
                         sPanel.resumeTimer();
                         dialog.dispose();
                         playSound("sounds/button.wav");
-                        playSound("sounds/gamemusic.wav");
+                        
                     }
                 });
 
@@ -287,28 +321,7 @@ public final class SudokuFrame extends JFrame {
         lbHint.setText("Hint: " + hint + "/5");
     }
     
-    public void createAudioAction(){
-        btnAudio.addActionListener((ActionEvent e) -> {
-            if (btnAudio.isSelected()==true) {
-                stopSound();
-                playSound("sounds/button.wav");
-                ImageIcon audioIcon = new ImageIcon("sounds/mute.png");
-                Image img = audioIcon.getImage();
-                Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-                ImageIcon scaledIcon = new ImageIcon(newImage);
-                btnAudio.setIcon(scaledIcon);
-            }else{
-                playSound("sounds/button.wav");
-                playSound("sounds/gamemusic.wav");
-                ImageIcon audioIcon = new ImageIcon("sounds/volume.png");
-                Image img = audioIcon.getImage();
-                Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-                ImageIcon scaledIcon = new ImageIcon(newImage);
-                btnAudio.setIcon(scaledIcon);
-            }
-        });
-    }
-    
+
 //    //Like above
    public void rebuildInterface(SudokuPuzzleType puzzleType, int fontSize, ButtonGroup group) {
         SudokuPuzzle generatedPuzzle = new SudokuGenerator().generateRandomSudoku(puzzleType, group.getSelection().getActionCommand());
@@ -396,25 +409,21 @@ public final class SudokuFrame extends JFrame {
         }
     }
     
+    public void playMusic(String path){
+        sound.setFile(path);
+        sound.play();
+        sound.loop();
+    }
+    
     public void playSound(String soundFile) {
         try {
             File file = new File(soundFile);
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
             clip = AudioSystem.getClip();
             clip.open(audioStream);
-            if(soundFile.equals("sounds/gamemusic.wav")){
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
-            }
             clip.start();
         } catch (Exception e) {
             System.out.println("Error playing sound: " + e.getMessage());
-        }
-    }
-    
-    public void stopSound() {
-        if (clip != null && clip.isRunning()) {
-            clip.stop(); 
-            clip.close(); 
         }
     }
     
