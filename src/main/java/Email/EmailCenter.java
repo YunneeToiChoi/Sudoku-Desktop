@@ -1,23 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package Mail;
-import javax.mail.*;
-import javax.mail.internet.*;
+package Email;
 import java.util.Properties;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 /**
  *
  * @author Tran Giap
  */
-public class Email {
-    
-    public static final String Gmail_Host ="smtp.gmail.com";
-    public static final String Sender_Email_Address ="pettertran1121@gmail.com";
-    public static final String Sender_Email_Password ="osrz ukpf adry gxpg";
-    
- 
-     public static void sendEmail(String otp, String receiverEmail) {
+public class EmailCenter {
+         public static final String Gmail_Host = "smtp.gmail.com";
+    public static final String Sender_Email_Address = "pettertran1121@gmail.com";
+    public static final String Sender_Email_Password = "osrz ukpf adry gxpg";
+
+    public static void sendEmail(String otp, String receiverEmail) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -36,7 +37,7 @@ public class Email {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(receiverEmail));
             message.setSubject("Xác thực tài khoản với mã OTP");
 
-            // Định dạng nội dung email
+            // Format content email
             String emailContent = "Chào bạn,\n\n"
                     + "Bạn đã yêu cầu xác thực tài khoản của mình. Đây là mã OTP của bạn:\n\n"
                     + "Mã OTP: " + otp + "\n\n"
@@ -48,7 +49,7 @@ public class Email {
 
             message.setText(emailContent);
 
-            // Gửi email trên một thread mới
+            // Send email on new thread
             new Thread(() -> {
                 try {
                     Transport.send(message);
