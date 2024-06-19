@@ -6,12 +6,19 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -24,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -39,7 +47,9 @@ public final class SudokuFrame extends JFrame {
     private final JButton btnHint;
     private final JLabel lbHint;
     private JTextField[][] cells;
-   
+    private Clip clip;
+    private JToggleButton btnAudio;
+
 
     public SudokuFrame() {
         SudokuFrame frame = this;
@@ -54,6 +64,7 @@ public final class SudokuFrame extends JFrame {
         JMenu file = new JMenu("Game");
         JMenu newGame = new JMenu("New Game");
         JMenu mode = new JMenu("Mode");
+        JMenu audio = new JMenu("Audio");
         ButtonGroup group = new ButtonGroup();
 
         //Create child of item (JMenu > JMenuItem)
@@ -83,6 +94,7 @@ public final class SudokuFrame extends JFrame {
         file.add(newGame);
         menuBar.add(file);
         menuBar.add(mode);
+        menuBar.add(audio);
         frame.setJMenuBar(menuBar);
 
         //Create Panel
@@ -102,6 +114,13 @@ public final class SudokuFrame extends JFrame {
         nullPanel.setLayout(new FlowLayout());
         
 
+        //Left Panel
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BorderLayout());
+        leftPanel.setPreferredSize(new Dimension(200, 200));
+        JPanel nullPanel2 = new JPanel();
+        nullPanel2.setLayout(new FlowLayout());
+        
         //Create button
         buttonSelectionPanel = new JPanel();
         buttonSelectionPanel.setPreferredSize(new Dimension(200, 200));
@@ -147,8 +166,20 @@ public final class SudokuFrame extends JFrame {
 
         pauseButton = new JButton("Pause");
         createPauseAction();
-
-
+        
+        ImageIcon audioIcon = new ImageIcon("sounds/volume.png");
+        Image img = audioIcon.getImage();
+        Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(newImage);
+        
+        btnAudio = new JToggleButton();
+        btnAudio.setOpaque(false);
+        btnAudio.setContentAreaFilled(false);
+        btnAudio.setIcon(scaledIcon);
+        btnAudio.setBorderPainted(false);
+        createAudioAction();
+        
+        //
         nullPanel.add(notePanel);
         rightPanel.add(nullPanel,BorderLayout.CENTER);
         rightPanel.add(noteTitle,BorderLayout.NORTH);
@@ -157,15 +188,18 @@ public final class SudokuFrame extends JFrame {
         bottomPanel.add(delete);
         bottomPanel.add(undoButton);
         bottomPanel.add(btnHint);
+        bottomPanel.add(pauseButton);
         bottomPanel.add(lbHint);
         //
-        
+        nullPanel2.add(buttonSelectionPanel);
+        leftPanel.add(nullPanel2,BorderLayout.CENTER);
+        leftPanel.add(btnAudio,BorderLayout.NORTH);
 
 
         
         //Add this to frame
         windowPanel.add(sPanel,BorderLayout.CENTER);
-        windowPanel.add(buttonSelectionPanel,BorderLayout.WEST);
+        windowPanel.add(leftPanel,BorderLayout.WEST);
         windowPanel.add(rightPanel, BorderLayout.EAST);
         windowPanel.add(lTimerJLabel,BorderLayout.NORTH);    
         windowPanel.add(bottomPanel,BorderLayout.SOUTH);
@@ -173,20 +207,23 @@ public final class SudokuFrame extends JFrame {
         this.add(windowPanel);
         //Use to create new game when openning game (defalut 9x9, font size 26, mode: easy)
         rebuildInterface(SudokuPuzzleType.NINEBYNINE, 26, group);
-
+        playSound("sounds/gamemusic.wav");
     }
 
     
     private void createUndoAction() {
         undoButton.addActionListener((ActionEvent e) -> {
+            playSound("sounds/button.wav");
             sPanel.undoMove();
         });
     }
     private void createPauseAction() {
         pauseButton.addActionListener((ActionEvent e) -> {
+            stopSound();
+            playSound("sounds/pausing.wav");
             if (sPanel.getTimerState()) {
                 sPanel.pauseTimer();
-
+                
                 // Create a JOptionPane with a custom OK button
                 JOptionPane optionPane = new JOptionPane(
                     "Game is pausing",
@@ -211,6 +248,8 @@ public final class SudokuFrame extends JFrame {
                         // Resume the timer when OK is clicked
                         sPanel.resumeTimer();
                         dialog.dispose();
+                        playSound("sounds/button.wav");
+                        playSound("sounds/gamemusic.wav");
                     }
                 });
 
@@ -228,12 +267,14 @@ public final class SudokuFrame extends JFrame {
     
     public void createDeleteAction(){
         delete.addActionListener((ActionEvent e) -> {
+            playSound("sounds/button.wav");
             sPanel.deleteValue();
         });
     }
 
     public void createHintAction(){
         btnHint.addActionListener((ActionEvent e) -> {
+            playSound("sounds/hint.wav");
             if (sPanel.getHint() < 5) {
                 sPanel.autoFill();
             }else{
@@ -244,6 +285,28 @@ public final class SudokuFrame extends JFrame {
     
     public void updateHint(int hint){
         lbHint.setText("Hint: " + hint + "/5");
+    }
+    
+    public void createAudioAction(){
+        btnAudio.addActionListener((ActionEvent e) -> {
+            if (btnAudio.isSelected()==true) {
+                stopSound();
+                playSound("sounds/button.wav");
+                ImageIcon audioIcon = new ImageIcon("sounds/mute.png");
+                Image img = audioIcon.getImage();
+                Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(newImage);
+                btnAudio.setIcon(scaledIcon);
+            }else{
+                playSound("sounds/button.wav");
+                playSound("sounds/gamemusic.wav");
+                ImageIcon audioIcon = new ImageIcon("sounds/volume.png");
+                Image img = audioIcon.getImage();
+                Image newImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(newImage);
+                btnAudio.setIcon(scaledIcon);
+            }
+        });
     }
     
 //    //Like above
@@ -298,7 +361,7 @@ public final class SudokuFrame extends JFrame {
                 });
             }
         }
-        
+                         
         sPanel.repaint();
         sPanel.startTimer();
         sPanel.resetMoveHistory();
@@ -330,6 +393,28 @@ public final class SudokuFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             rebuildInterface(puzzleType, fontSize, mode);
+        }
+    }
+    
+    public void playSound(String soundFile) {
+        try {
+            File file = new File(soundFile);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
+            clip = AudioSystem.getClip();
+            clip.open(audioStream);
+            if(soundFile.equals("sounds/gamemusic.wav")){
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+            clip.start();
+        } catch (Exception e) {
+            System.out.println("Error playing sound: " + e.getMessage());
+        }
+    }
+    
+    public void stopSound() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop(); 
+            clip.close(); 
         }
     }
     
