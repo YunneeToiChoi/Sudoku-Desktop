@@ -3,6 +3,7 @@ com\mycompany\sudokuswing\SudokuFrame$1$2.class
 com\mycompany\sudokuswing\SudokuPuzzleType.class
 loginandsignup\LoginAndSignUp.class
 com\mycompany\sudokuswing\SudokuGenerator.class
+com\mycompany\sudokuswing\FunctionButton.class
 Mail\Email.class
 com\mycompany\sudokuswing\SudokuPanel$SudokuPanelMouseAdapter.class
 com\mycompany\sudokuswing\SudokuFrame$1$1.class
@@ -10,6 +11,7 @@ loginandsignup\Login.class
 loginandsignup\VerifyCode.class
 Mail\Email$1.class
 com\mycompany\sudokuswing\SudokuFrame$NewGameListener.class
+com\mycompany\sudokuswing\SudokuFrame$3.class
 com\mycompany\sudokuswing\SudokuPanel.class
 com\mycompany\sudokuswing\SudokuFrame.class
 loginandsignup\SignUp.class

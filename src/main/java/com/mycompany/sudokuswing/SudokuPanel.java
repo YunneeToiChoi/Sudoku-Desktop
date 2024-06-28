@@ -170,9 +170,13 @@ public class SudokuPanel extends JPanel{
                 if(puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol].equals("")){
                 JOptionPane.showMessageDialog(this, "Cell trống");
                 frame.playSound("sounds/button.wav");
-            }else{
-                if(!puzzle.getCellColor(currentlySelectedRow, currentlySelectedCol).equals(Color.BLACK)){
+                }else{
+                if(puzzle.getCellColor(currentlySelectedRow, currentlySelectedCol).equals(Color.RED)){
                     puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = "";
+                }else if (puzzle.getCellColor(currentlySelectedRow, currentlySelectedCol).equals(Color.BLUE)||
+                        puzzle.getCellColor(currentlySelectedRow, currentlySelectedCol).equals(Color.GREEN)) {
+                    JOptionPane.showMessageDialog(this, "Cell đã điền đúng, không thể xóa");
+                    frame.playSound("sounds/button.wav");
                 }
                 else{
                     JOptionPane.showMessageDialog(this, "Cell đề bài");
@@ -212,7 +216,7 @@ public class SudokuPanel extends JPanel{
                     // Try to place the value in the empty slot if it's a valid move
                     if (puzzle.isValidMove(row, col, value) && hint < 5) {
                         puzzle.board[row][col] = value;
-                        puzzle.setCellColor(row, col, new Color(194, 197, 29));
+                        puzzle.setCellColor(row, col, Color.GREEN);
                         repaint();
                         hint++;
                         frame.updateHint(hint);
@@ -246,7 +250,7 @@ public class SudokuPanel extends JPanel{
                 //Use to draw vertical line
 		for(int x = 0;x <= usedWidth;x+=slotWidth) {
 			if((x/slotWidth) % puzzle.getBoxWidth() == 0) {
-				g2d.setStroke(new BasicStroke(2));
+				g2d.setStroke(new BasicStroke(3));
 				g2d.drawLine(x, 0, x, usedHeight);
 			}
 			else {
@@ -258,7 +262,7 @@ public class SudokuPanel extends JPanel{
                 //Use to draw horizontal line
 		for(int y = 0;y <= usedHeight;y+=slotHeight) {
 			if((y/slotHeight) % puzzle.getBoxHeight() == 0) {
-				g2d.setStroke(new BasicStroke(2));
+				g2d.setStroke(new BasicStroke(3));
 				g2d.drawLine(0, y, usedWidth, y);
 			}
 			else {
@@ -267,10 +271,10 @@ public class SudokuPanel extends JPanel{
 			}
 		}
                 //Use to set font, width, height of text in box 
-		Font f = new Font("Times New Roman", Font.PLAIN, fontSize);
-                g2d.setFont(f);
-		FontRenderContext fContext = g2d.getFontRenderContext();
-		for(int row=0;row < puzzle.getNumRows();row++) {
+                    Font f = new Font("Times New Roman", Font.PLAIN, fontSize);
+                    g2d.setFont(f);
+                    FontRenderContext fContext = g2d.getFontRenderContext();
+                    for(int row=0;row < puzzle.getNumRows();row++) {
 			for(int col=0;col < puzzle.getNumColumns();col++) {
                             String cellValue = puzzle.getValue(row, col);
                             if (!cellValue.equals("")) {
@@ -288,14 +292,13 @@ public class SudokuPanel extends JPanel{
                             g2d.drawString(puzzle.getValue(row, col), (col * slotWidth) + ((slotWidth / 2) - (textWidth / 2)), (row * slotHeight) + ((slotHeight / 2) + (textHeight / 2)));
                             }        
 			}
-		}
-
+                }
+                		
         //Use to set color while clicking in box
 		if(currentlySelectedCol != -1 && currentlySelectedRow != -1 ) {
                         
 			g2d.setColor(new Color(0.0f,0.0f,1.0f,0.3f));
 			g2d.fillRect(currentlySelectedCol * slotWidth,currentlySelectedRow * slotHeight,slotWidth,slotHeight);
-                        frame.getCells()[currentlySelectedRow][currentlySelectedCol].requestFocus();
 		}
 
              }    
